@@ -1,0 +1,9 @@
+{
+  "name": "intent",
+  "description": "Intent-First Development - turn user intent into validated tickets, then execute",
+  "version": "1.0.0",
+  "license": "MIT",
+  "author": {
+    "name": "Mo"
+  }
+}
