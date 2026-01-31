@@ -95,6 +95,14 @@ Get credentials: https://turso.tech or turso CLI"
 4. After user confirms `.env` created:
    - Create tables: `npx intent-turso init`
    - Verify: `npx intent-turso ticket list`
+5. Add permission to `.claude/settings.local.json`:
+   ```json
+   {
+     "permissions": {
+       "allow": ["Bash(npx intent-turso:*)"]
+     }
+   }
+   ```
 
 ## Step 3: Write CLAUDE.md
 

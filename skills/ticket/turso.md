@@ -72,15 +72,30 @@ After ticket is Done, extract learnings:
 
 ### Create Knowledge
 
+Pipe markdown via heredoc:
+
 ```bash
-intent-turso knowledge create \
-  --title "Pattern Title" \
-  --content "..." \
-  --namespace project-name \
-  --category pattern \
-  --scope new-only \
-  --origin INT-20260131-slug \
-  --tags tag1 tag2
+intent-turso knowledge create --stdin << 'EOF'
+# Pattern Title
+
+**Namespace:** project-name
+**Category:** pattern
+**Origin Type:** discovery
+**Confidence:** 0.8
+**Scope:** new-only
+**Tags:** tag1, tag2
+
+## Content
+
+Why:
+[Rationale]
+
+When:
+[Conditions]
+
+Pattern:
+[The approach]
+EOF
 ```
 
 ### Update Knowledge
@@ -140,6 +155,14 @@ Responsibility:
 Interfaces:
 [How to interact with it]
 ```
+
+### Origin Type
+
+| Type | Source | `--origin-type` | `--origin` |
+|------|--------|-----------------|------------|
+| `ticket` | Extracted from ticket | auto | `INT-xxx` |
+| `discovery` | AI explored codebase | `discovery` | - |
+| `manual` | User input | `manual` (default) | - |
 
 ### Decision Scope
 
