@@ -1,12 +1,21 @@
 ---
-description: Configure Intent task manager (Linear/GitHub/Jira/Asana/Local/Turso)
+description: Configure Intent task manager (Linear/Asana/Local/Turso)
 ---
 
 # Intent Setup
 
 ## Step 1: Select Task Manager
 
-`AskUserQuestion` → "Which task manager?" → Linear | GitHub Issues | Jira | Asana | Local | Turso (Cloud + Knowledge)
+Use `AskUserQuestion` with EXACTLY these 4 options (do NOT omit any):
+
+```
+Question: "Which task manager?"
+Options:
+1. Linear
+2. Asana
+3. Local (file-based)
+4. Turso (Cloud + Knowledge)
+```
 
 ## Step 2: Load & Fetch
 
@@ -31,34 +40,6 @@ Options: team names from above result
 ```
 
 Only if mcp__linear__list_teams not found → see [install.md](../references/install.md)
-
-### GitHub
-
-```
-Tool: Bash
-Command: gh auth status
-```
-
-```
-Tool: Bash
-Command: gh repo list --limit 10
-```
-
-```
-Tool: AskUserQuestion
-Options: repo names from above
-```
-
-### Jira
-
-```
-Tool: ToolSearch
-Parameter: query = "select:mcp__jira__list_projects"
-```
-
-Then call the returned Jira tool, then AskUserQuestion.
-
-Only if tool not found → see [install.md](../references/install.md)
 
 ### Asana
 
@@ -98,36 +79,29 @@ Create folder: `mkdir -p .intent/tickets`
 
 ### Turso
 
-```
-Tool: Bash
-Command: npx intent-turso --version
-```
-
-If not installed → see [install.md](../references/install.md)
-
-If installed:
+1. Check CLI: `npx intent-turso --version`
+2. If not installed → see [install.md](../references/install.md)
+3. Guide user to create `.intent/.env` (do NOT ask for credentials in chat):
 
 ```
-Tool: AskUserQuestion
-Question: "Enter your Turso database URL (libsql://...)"
+mkdir -p .intent
+echo "Create .intent/.env with:
+TURSO_URL=\"libsql://your-db.turso.io\"
+TURSO_AUTH_TOKEN=\"your-token\"
+
+Get credentials: https://turso.tech or turso CLI"
 ```
 
-```
-Tool: AskUserQuestion
-Question: "Enter your Turso auth token"
-```
-
-```
-Tool: Bash
-Command: npx intent-turso init --url "{url}" --token "{token}"
-```
+4. After user confirms `.env` created:
+   - Create tables: `npx intent-turso init`
+   - Verify: `npx intent-turso ticket list`
 
 ## Step 3: Write CLAUDE.md
 
 ```markdown
 ## Intent Config
-- Task Manager: {Linear|GitHub|Jira|Asana|Local}
-- {Team|Repo|Project|Workspace/Project|Path}: {name} (ID: {id})
+- Task Manager: {Linear|Asana|Local|Turso}
+- {Team|Workspace/Project|Path|Database}: {name} (ID: {id})
 
 ### Adapter
 | Action | Tool |
@@ -144,8 +118,6 @@ Command: npx intent-turso init --url "{url}" --token "{token}"
 | Manager | Create | Fetch | Update | Comment | List |
 |---------|--------|-------|--------|---------|------|
 | Linear | `mcp__linear__create_issue` | `mcp__linear__get_issue` | `mcp__linear__update_issue` | `mcp__linear__create_comment` | `mcp__linear__list_issues` |
-| GitHub | `gh issue create` | `gh issue view` | `gh issue edit` | `gh issue comment` | `gh issue list` |
-| Jira | `mcp__jira__create_issue` | `mcp__jira__get_issue` | `mcp__jira__update_issue` | `mcp__jira__add_comment` | `mcp__jira__search_issues` |
 | Asana | `mcp__asana__asana_create_task` | `mcp__asana__asana_get_task` | `mcp__asana__asana_update_task` | `mcp__asana__asana_create_task_story` | `mcp__asana__asana_search_tasks` |
 | Local | Write `.intent/tickets/[id].md` | Read file | Edit file | Append to file | Glob `.intent/tickets/*.md` |
 | Turso | `intent-turso ticket create --stdin` | `intent-turso ticket get {id}` | `intent-turso ticket update {id}` | `intent-turso ticket update {id} --comment '{...}'` | `intent-turso ticket list` |

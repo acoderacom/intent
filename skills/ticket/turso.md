@@ -62,15 +62,13 @@ intent-turso ticket update INT-20260131-slug --comment "Started implementation"
 intent-turso ticket update INT-20260131-slug --complete-task 0
 ```
 
-## Knowledge Operations
+## Knowledge Extraction (Step 6)
 
-### Extract Knowledge (after ticket is Done)
+After ticket is Done, extract learnings:
 
-```bash
-intent-turso extract INT-20260131-slug
-```
-
-Returns proposed knowledge entries for AI to confirm with user.
+1. `intent-turso extract {ticket-id}` → returns proposals
+2. `AskUserQuestion`: "Extract knowledge?" → Accept all | Select | Skip
+3. For accepted: `intent-turso knowledge create ...`
 
 ### Create Knowledge
 

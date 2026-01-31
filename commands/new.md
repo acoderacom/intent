@@ -1,5 +1,5 @@
 ---
-description: Use when user expresses intent to add, build, implement, or change something ("I want to...", "We need...", "Add/Build/Create..."), describes a feature, references a ticket ID, or says "create/implement ticket". Covers creating features, building components, adding functionality, or modifying behavior.
+description: Create and execute development tickets. Triggers on "I want...", "Add/Build/Create...", ticket IDs (INT-*), or "create ticket". Covers features, components, and behavior changes.
 disable-model-invocation: true
 ---
 

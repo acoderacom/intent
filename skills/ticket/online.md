@@ -1,4 +1,4 @@
-# Online Ticket Format (Linear/GitHub/Jira/Asana)
+# Online Ticket Format (Linear/Asana)
 
 Title: `[INT-YYYYMMDD-HHMMSS] {intent summary}`
 

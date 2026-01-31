@@ -1,6 +1,6 @@
 ---
 name: ticket
-description: Use when user expresses intent to add, build, implement, or change something ("I want to...", "We need...", "Add/Build/Create..."), describes a feature, references a ticket ID, or says "create/implement ticket". Covers creating features, building components, adding functionality, or modifying behavior.
+description: Create and execute development tickets. Triggers on "I want...", "Add/Build/Create...", ticket IDs (INT-*), or "create ticket". Covers features, components, and behavior changes.
 ---
 
 # Intent-First Development
@@ -10,20 +10,14 @@ Turn user intent into validated tickets, AI execute - Human review.
 ## Prerequisites (BLOCKING)
 
 1. Read `CLAUDE.md` for `## Intent Config`
-2. If missing → invoke `/intent:setup`, then continue to Step 1
-3. **No config = no proceed**
+2. If missing → `/intent:setup` first
+3. Identify adapter: Local (`local.md`), Online (`online.md`), or Turso (`turso.md`)
 
 ## Step 1: Context
 
-Read `CLAUDE.md`, check project state. Use context for informed questions.
+Read `CLAUDE.md`, check project state.
 
-**If Turso adapter**: Search knowledge base for relevant context:
-
-```
-Tool: Bash
-Command: intent-turso search "<summarized user intent>" --limit 3
-```
-
+**Turso only**: Search knowledge → `intent-turso search "<intent>" --limit 3`
 Include relevant knowledge in the ticket's Context field.
 
 ## Step 2: Clarify
@@ -34,7 +28,7 @@ Stop if: unclear after 2 questions, or needs explicit trade-off choice.
 
 ## Step 3: Capture
 
-1. Preview ticket using format from `local.md` (Local), `online.md` (Online), or `turso.md` (Turso)
+1. Preview ticket (format per adapter file)
 2. Use `AskUserQuestion`: "Create this ticket?" → Yes, continue | Just create ticket | No, let me clarify
 3. **Wait for confirmation before creating anything**
 
@@ -61,36 +55,26 @@ Stop if: Class C or irreversible changes.
 
 ## Step 6: Review (MANDATORY)
 
-1. Update ticket via adapter Update tool:
-- Set `**Status:** In Review`
+1. Set `**Status:** In Review`
 2. Run code checks (test, lint, typecheck, build)
 3. Fix failures → re-run
-4. Use `AskUserQuestion`: "Implementation complete. Please review." → Approve | Request changes
-5. After approval → Update ticket: `**Status:** Done`
-- Mark all tasks as `- [x]`
-- Mark all DoD as `- [x]`
-6. Ask: "Any patterns to add to CLAUDE.md?"
-7. **Knowledge Extraction** (if Turso adapter):
+4. `AskUserQuestion`: "Implementation complete. Please review." → Approve | Request changes
+5. After approval:
+   - Set `**Status:** Done` (Turso: `intent-turso ticket update {id} --status Done`)
+   - Mark all tasks `[x]` (Turso: `--complete-task 0`, `--complete-task 1`, ...)
+   - Mark all DoD `[x]` (Turso: `--complete-dod 0`, `--complete-dod 1`, ...)
 
-```
-Tool: Bash
-Command: intent-turso extract {ticket-id}
-```
+## Step 7: Knowledge Extraction (Turso only)
 
-Parse JSON output. Present proposed knowledge to user:
+1. Run `intent-turso extract {ticket-id}`
+2. Parse JSON, present proposals to user:
+   - `AskUserQuestion`: "Extract this knowledge?" → Accept all | Select items | Skip
+3. For accepted items, create with structured content (see `turso.md`):
+   - `intent-turso knowledge create --title "..." --content "..." --namespace {ns} --category {cat} --origin {ticket-id}`
 
-```
-Tool: AskUserQuestion
-Question: "Extract this knowledge?"
-Options: Accept all | Select items | Skip
-```
+## Step 8: Capture Patterns
 
-For accepted items:
-
-```
-Tool: Bash
-Command: intent-turso knowledge create --json '{...}'
-``` 
+Ask: "Any patterns to add to CLAUDE.md?" 
 
 ## Change Classes
 

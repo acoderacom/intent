@@ -2,15 +2,6 @@
 
 Show only when MCP tool call fails with "tool not found".
 
-## GitHub
-
-GitHub CLI (`gh`) is typically pre-installed. Verify:
-```bash
-gh auth status
-```
-
-If not installed: https://cli.github.com/
-
 ## Linear
 
 Add to `~/.claude/settings.json`:
@@ -33,30 +24,6 @@ Get key: Linear → Settings → API → Personal API keys
 
 Restart Claude Code after adding.
 
-## Jira
-
-Add to `~/.claude/settings.json`:
-
-```json
-{
-  "mcpServers": {
-    "jira": {
-      "command": "npx",
-      "args": ["-y", "@anthropic/mcp-server-jira"],
-      "env": {
-        "JIRA_HOST": "https://company.atlassian.net",
-        "JIRA_EMAIL": "<email>",
-        "JIRA_API_TOKEN": "<token>"
-      }
-    }
-  }
-}
-```
-
-Get token: Atlassian Account → Security → API tokens
-
-Restart Claude Code after adding.
-
 ## Asana
 
 Run this command:
@@ -71,42 +38,54 @@ Restart Claude Code after adding.
 
 ## Turso
 
-Install the intent-turso CLI globally:
+### 1. Install CLI
 
 ```bash
 npm install -g intent-turso
 ```
 
-Or use npx (no install required):
+Or use via npx: `npx intent-turso --version`
 
+### 2. Get Credentials
+
+**Option A: Turso Dashboard**
+1. Create database at https://turso.tech (free tier)
+2. Copy URL and create auth token from dashboard
+
+**Option B: Turso CLI**
 ```bash
-npx intent-turso --version
+curl -sSfL https://get.tur.so/install.sh | bash
+turso auth login
+turso db create intent-db
+turso db show intent-db --url        # Copy this
+turso db tokens create intent-db     # Copy this
 ```
 
-### Get Turso Credentials
-
-1. Create a database at https://turso.tech (free tier available)
-2. Install Turso CLI: `curl -sSfL https://get.tur.so/install.sh | bash`
-3. Login: `turso auth login`
-4. Create database: `turso db create intent-db`
-5. Get URL: `turso db show intent-db --url`
-6. Get token: `turso db tokens create intent-db`
-
-### Initialize
+### 3. Create `.intent/.env`
 
 ```bash
-intent-turso init --url "libsql://your-db.turso.io" --token "your-token"
+mkdir -p .intent
 ```
 
-This creates `.intent/turso.json` with your credentials.
+Create `.intent/.env` manually (do NOT paste credentials in AI chat):
 
-**Note:** Add `.intent/turso.json` to `.gitignore` to keep credentials secure.
+```env
+TURSO_URL="libsql://your-db.turso.io"
+TURSO_AUTH_TOKEN="your-token"
+```
 
-### Environment Variables (Alternative)
-
-Instead of `--url` and `--token`, you can set:
+### 4. Initialize Database
 
 ```bash
-export TURSO_URL="libsql://your-db.turso.io"
-export TURSO_AUTH_TOKEN="your-token"
+intent-turso init
 ```
+
+Creates tables if they don't exist.
+
+### 5. Verify
+
+```bash
+intent-turso ticket list
+```
+
+**Security:** Add `.intent/.env` to `.gitignore`
