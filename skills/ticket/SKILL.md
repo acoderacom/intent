@@ -17,6 +17,15 @@ Turn user intent into validated tickets, AI execute - Human review.
 
 Read `CLAUDE.md`, check project state. Use context for informed questions.
 
+**If Turso adapter**: Search knowledge base for relevant context:
+
+```
+Tool: Bash
+Command: intent-turso search "<summarized user intent>" --limit 3
+```
+
+Include relevant knowledge in the ticket's Context field.
+
 ## Step 2: Clarify
 
 Use `AskUserQuestion` - one question at a time, 2-4 options each. Focus on purpose, constraints, definition of done. For multiple approaches lead with recommended option, explain trade-offs in descriptions.
@@ -25,12 +34,12 @@ Stop if: unclear after 2 questions, or needs explicit trade-off choice.
 
 ## Step 3: Capture
 
-1. Preview ticket using format from `local.md` (Local) or `online.md` (Online)
+1. Preview ticket using format from `local.md` (Local), `online.md` (Online), or `turso.md` (Turso)
 2. Use `AskUserQuestion`: "Create this ticket?" → Yes, continue | Just create ticket | No, let me clarify
 3. **Wait for confirmation before creating anything**
 
 After confirm:
-4. Create ticket via adapter
+4. Create ticket via adapter (for Turso: pipe markdown via `--stdin` heredoc)
 5. Create tasks via `TaskCreate`
 6. Set dependencies via `TaskUpdate`
 7. If "Just create ticket" → stop here
@@ -59,8 +68,29 @@ Stop if: Class C or irreversible changes.
 4. Use `AskUserQuestion`: "Implementation complete. Please review." → Approve | Request changes
 5. After approval → Update ticket: `**Status:** Done`
 - Mark all tasks as `- [x]`
-- Mark all DoD as `- [x]` 
-6. Ask: "Any patterns to add to CLAUDE.md?" 
+- Mark all DoD as `- [x]`
+6. Ask: "Any patterns to add to CLAUDE.md?"
+7. **Knowledge Extraction** (if Turso adapter):
+
+```
+Tool: Bash
+Command: intent-turso extract {ticket-id}
+```
+
+Parse JSON output. Present proposed knowledge to user:
+
+```
+Tool: AskUserQuestion
+Question: "Extract this knowledge?"
+Options: Accept all | Select items | Skip
+```
+
+For accepted items:
+
+```
+Tool: Bash
+Command: intent-turso knowledge create --json '{...}'
+``` 
 
 ## Change Classes
 

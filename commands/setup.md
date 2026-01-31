@@ -1,12 +1,12 @@
 ---
-description: Configure Intent task manager (Linear/GitHub/Jira/Asana/Local)
+description: Configure Intent task manager (Linear/GitHub/Jira/Asana/Local/Turso)
 ---
 
 # Intent Setup
 
 ## Step 1: Select Task Manager
 
-`AskUserQuestion` → "Which task manager?" → Linear | GitHub Issues | Jira | Asana | Local
+`AskUserQuestion` → "Which task manager?" → Linear | GitHub Issues | Jira | Asana | Local | Turso (Cloud + Knowledge)
 
 ## Step 2: Load & Fetch
 
@@ -96,6 +96,32 @@ Only if mcp__asana__asana_list_workspaces not found → see [install.md](../refe
 
 Create folder: `mkdir -p .intent/tickets`
 
+### Turso
+
+```
+Tool: Bash
+Command: npx intent-turso --version
+```
+
+If not installed → see [install.md](../references/install.md)
+
+If installed:
+
+```
+Tool: AskUserQuestion
+Question: "Enter your Turso database URL (libsql://...)"
+```
+
+```
+Tool: AskUserQuestion
+Question: "Enter your Turso auth token"
+```
+
+```
+Tool: Bash
+Command: npx intent-turso init --url "{url}" --token "{token}"
+```
+
 ## Step 3: Write CLAUDE.md
 
 ```markdown
@@ -122,6 +148,14 @@ Create folder: `mkdir -p .intent/tickets`
 | Jira | `mcp__jira__create_issue` | `mcp__jira__get_issue` | `mcp__jira__update_issue` | `mcp__jira__add_comment` | `mcp__jira__search_issues` |
 | Asana | `mcp__asana__asana_create_task` | `mcp__asana__asana_get_task` | `mcp__asana__asana_update_task` | `mcp__asana__asana_create_task_story` | `mcp__asana__asana_search_tasks` |
 | Local | Write `.intent/tickets/[id].md` | Read file | Edit file | Append to file | Glob `.intent/tickets/*.md` |
+| Turso | `intent-turso ticket create --stdin` | `intent-turso ticket get {id}` | `intent-turso ticket update {id}` | `intent-turso ticket update {id} --comment '{...}'` | `intent-turso ticket list` |
+
+### Turso Knowledge Operations (Additional)
+
+| Action | Tool |
+|--------|------|
+| Extract | `intent-turso extract {ticket-id}` |
+| Search | `intent-turso search "{query}"` |
 
 ## Step 4: Confirm
 
