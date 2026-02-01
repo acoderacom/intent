@@ -94,7 +94,9 @@ Stop if: Class C or irreversible changes.
 2. Run code checks (test, lint, typecheck, build)
 3. Fix failures → re-run
 4. `AskUserQuestion`: "Implementation complete. Please review." → Approve | Request changes
-5. After approval: Set status to `Done`, mark all tasks and DoD complete
+5. After approval (one command):
+   - Turso: `npx intent-turso ticket update <id> --status "Done" --complete-all`
+   - Linear: `mcp__linear__update_issue` with state + update description checkboxes
 
 ## Step 7: Knowledge Extraction (Turso only)
 
@@ -151,9 +153,9 @@ Ask: "Any patterns to add to CLAUDE.md?"
 |--------|---------|
 | Create | `npx intent-turso ticket create --stdin` (heredoc) |
 | Fetch | `npx intent-turso ticket get <id>` |
-| Update | `npx intent-turso ticket update <id> --status <status>` |
-| Complete task | `npx intent-turso ticket update <id> --complete-task <index>` |
-| Complete DoD | `npx intent-turso ticket update <id> --complete-dod <index>` |
+| Update status | `npx intent-turso ticket update <id> --status <status>` |
+| Complete all | `npx intent-turso ticket update <id> --status "Done" --complete-all` |
+| Complete selective | `npx intent-turso ticket update <id> --complete-task 0,1 --complete-dod 0,2` |
 | Comment | `npx intent-turso ticket update <id> --comment '<text>'` |
 | List | `npx intent-turso ticket list [--status <status>]` |
 | Search | `npx intent-turso search "<query>" --limit 5` |
