@@ -5,21 +5,21 @@ disable-model-invocation: true
 
 # Knowledge Discovery
 
-Explore codebase → extract understanding → save as knowledge.
+Explore codebase → capture understanding → save as searchable knowledge.
 
-## Prerequisites
+## Prerequisites (BLOCKING)
 
 1. Read `CLAUDE.md` for `## Intent Config`
 2. Requires Turso adapter
+3. If not configured → `/intent:setup` first
 
 ## Step 1: Explore
 
-Use Glob, Grep, Read to understand the topic. Identify:
-- How it works
-- Key files/components
-- Interfaces
+Use Task tool with `subagent_type=Explore` to understand the topic.
 
-## Step 2: Preview
+## Step 2: Capture
+
+1. Preview (single output):
 
 ```markdown
 # {Title}
@@ -29,28 +29,73 @@ Use Glob, Grep, Read to understand the topic. Identify:
 **Origin Type:** discovery
 **Confidence:** {see table below}
 **Scope:** {global|new-only}
-**Tags:** {kebab-case tags}
+**Tags:** {kebab-case, comma-separated}
 
 ## Content
 
-{Structured content - see turso.md for format by category}
+{Use format from "Content Format by Category" section}
 ```
 
-`AskUserQuestion`: "Save this knowledge?" → Yes | Edit | Cancel
+2. `AskUserQuestion`: "Save this knowledge?" → Yes | Edit | Cancel
+3. **Wait for confirmation before creating anything**
 
-## Step 3: Save
+After confirm:
+4. Pipe the previewed markdown to CLI:
 
 ```bash
-intent-turso knowledge create --stdin << 'EOF'
-{previewed markdown}
+npx intent-turso knowledge create --stdin << 'EOF'
+{paste previewed markdown here}
 EOF
 ```
 
-## Content Format
+## Content Format by Category
 
-See `turso.md` → Structured Content Format section.
+**Architecture:**
+```
+Component:
+{name}
 
-## Confidence
+Responsibility:
+{what it does}
+
+Interfaces:
+{how to interact}
+```
+
+**Pattern:**
+```
+Why:
+{rationale}
+
+When:
+{conditions to apply}
+
+Pattern:
+{the approach}
+```
+
+**Truth:**
+```
+Fact:
+{verified fact}
+
+Verified:
+{how/where verified}
+```
+
+**Principle:**
+```
+Rule:
+{the rule}
+
+Why:
+{rationale}
+
+Applies:
+{scope}
+```
+
+## Confidence Defaults
 
 | Category | Default |
 |----------|---------|

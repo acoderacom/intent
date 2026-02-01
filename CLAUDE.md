@@ -1,14 +1,6 @@
 # Intent Plugin
 
 ## Intent Config
-- Task Manager: Local
-- Path: .intent/tickets/
+- Task Manager: (not configured)
 
-### Adapter
-| Action | Tool |
-|--------|------|
-| Create | Write `.intent/tickets/[id].md` |
-| Fetch | Read file |
-| Update | Edit file |
-| Comment | Append to file |
-| List | Glob `.intent/tickets/*.md` |
+Run `/intent:setup` to configure Linear or Turso.
