@@ -1,102 +1,79 @@
 ---
-description: Configure Intent task manager (Linear/Turso)
+description: Configure Intent for this project
 ---
 
 # Intent Setup
 
-## Step 1: Select Task Manager
+## Step 1: Check Prerequisites
 
-Use `AskUserQuestion` with EXACTLY these 2 options:
-
-```
-Question: "Which task manager?"
-Options:
-1. Linear
-2. Turso
+```bash
+npx intent-turso --version
 ```
 
-## Step 2: Load & Fetch
+If fails → guide user to [install.md](../references/install.md), then return here.
 
-### Linear
+## Step 2: Create `.intent/.env`
 
-Execute these exact tool calls in order:
-
-```
-Tool: ToolSearch
-Parameter: query = "select:mcp__linear__list_teams"
-```
-
-```
-Tool: mcp__linear__list_teams
-Parameters: (none)
-Result: {teams: [{id, name}, ...]}
-```
-
-```
-Tool: AskUserQuestion
-Options: team names from above result
-```
-
-Only if mcp__linear__list_teams not found → see [install.md](../references/install.md)
-
-### Turso
-
-1. Check CLI: `npx intent-turso --version`
-2. If not installed → see [install.md](../references/install.md)
-3. Guide user to create `.intent/.env` (do NOT ask for credentials in chat):
-
-```
+```bash
 mkdir -p .intent
-echo "Create .intent/.env with:
-TURSO_URL=\"libsql://your-db.turso.io\"
-TURSO_AUTH_TOKEN=\"your-token\"
-
-Get credentials: https://turso.tech or turso CLI"
+echo ".intent/.env" >> .gitignore
 ```
 
-4. After user confirms `.env` created:
-   - Create tables: `npx intent-turso init`
-   - Verify: `npx intent-turso ticket list`
-5. Add permission to `.claude/settings.local.json`:
-   ```json
-   {
-     "permissions": {
-       "allow": ["Bash(npx intent-turso *)"]
-     }
-   }
-   ```
+Tell user to create `.intent/.env` manually with their credentials:
 
-## Step 3: Write CLAUDE.md
+```env
+TURSO_URL="libsql://your-db.turso.io"
+TURSO_AUTH_TOKEN="your-token"
+```
+
+**IMPORTANT:** Do NOT ask for credentials in chat. User must create file manually.
+
+## Step 3: Initialize Database
+
+After user confirms `.env` created:
+
+```bash
+npx intent-turso init
+npx intent-turso ticket list
+```
+
+## Step 4: Add Permissions
+
+Check if `.claude/settings.local.json` exists, then add permission:
+
+```json
+{
+  "permissions": {
+    "allow": ["Bash(npx intent-turso *)"]
+  }
+}
+```
+
+## Step 5: Write CLAUDE.md
+
+Append to project's `CLAUDE.md`:
 
 ```markdown
 ## Intent Config
-- Task Manager: {Linear|Turso}
-- {Team|Database}: {name} (ID: {id})
+- Task Manager: Turso
+- Database: Turso Cloud (configured via `.intent/.env`)
 
 ### Adapter
-| Action | Tool |
-|--------|------|
-| Create | {tool} |
-| Fetch | {tool} |
-| Update | {tool} |
-| Comment | {tool} |
-| List | {tool} |
+| Action | Command |
+|--------|---------|
+| Create | `npx intent-turso ticket create --stdin` |
+| Fetch | `npx intent-turso ticket get {id}` |
+| Update | `npx intent-turso ticket update {id}` |
+| Comment | `npx intent-turso ticket update {id} --comment '{...}'` |
+| List | `npx intent-turso ticket list` |
+
+### Knowledge Operations
+| Action | Command |
+|--------|---------|
+| Extract | `npx intent-turso extract {ticket-id}` |
+| Search | `npx intent-turso search "{query}"` |
 ```
 
-### Adapter Tool Mappings
+## Step 6: Confirm
 
-| Manager | Create | Fetch | Update | Comment | List |
-|---------|--------|-------|--------|---------|------|
-| Linear | `mcp__linear__create_issue` | `mcp__linear__get_issue` | `mcp__linear__update_issue` | `mcp__linear__create_comment` | `mcp__linear__list_issues` |
-| Turso | `intent-turso ticket create --stdin` | `intent-turso ticket get {id}` | `intent-turso ticket update {id}` | `intent-turso ticket update {id} --comment '{...}'` | `intent-turso ticket list` |
-
-### Turso Knowledge Operations (Additional)
-
-| Action | Tool |
-|--------|------|
-| Extract | `intent-turso extract {ticket-id}` |
-| Search | `intent-turso search "{query}"` |
-
-## Step 4: Confirm
-
-Say: "Intent configured for {Task Manager}. Use `/intent:new` to create tickets."
+Say: "Intent configured. Use `/intent:ticket` to create tickets."

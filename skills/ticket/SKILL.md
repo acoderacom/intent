@@ -7,7 +7,7 @@ description: Create and execute development tickets. Triggers on "I want...", "A
 
 Turn user intent into validated tickets, AI execute - Human review.
 
-> **Mental Model:** Ticket = Contract (WHAT & WHY) | Plan = Playbook (HOW)
+**Mental Model:** Ticket = Contract (WHAT & WHY) | Plan = Playbook (HOW) | Knowledge = Memory (LEARNED)
 
 ## Prerequisites (BLOCKING)
 
@@ -19,8 +19,9 @@ Turn user intent into validated tickets, AI execute - Human review.
 
 Read `CLAUDE.md`, check project state.
 
-**Turso only**: Search knowledge → `npx intent-turso search "<intent>" --limit 3`
+Search knowledge → `npx intent-turso search "<intent>" --limit 3`
 Include relevant knowledge in the ticket's Context field.
+Use `--ticket-type` filter when intent matches a specific type (e.g., bugfix intent → search bugfix knowledge).
 
 **Semantic Search Notes:**
 - Scores in 0.35–0.65 range are useful (relative, not absolute)
@@ -43,6 +44,8 @@ Body:
 ```markdown
 **Status:** Backlog
 
+**Type:** feature|bugfix|refactor|docs|chore|test (AI-inferred from intent)
+
 **Intent:** [what user wants]
 
 **Context:** [relevant files, patterns]
@@ -62,12 +65,25 @@ Body:
 **Change Class:** A|B|C - [reason]
 ```
 
+### Ticket Types (AI-inferred)
+
+| Type | Inferred From |
+|------|---------------|
+| `feature` | Add, create, build, implement, new |
+| `bugfix` | Fix, bug, error, broken, crash, fail |
+| `refactor` | Refactor, restructure, clean up, optimize |
+| `docs` | Document, readme, comment, explain |
+| `chore` | Update deps, migrate, config, CI/CD |
+| `test` | Test, spec, coverage, e2e |
+
 ### How to Save
 
-| Adapter | Method |
-|---------|--------|
-| Linear | `mcp__linear__create_issue` with title + body |
-| Turso | `npx intent-turso ticket create --stdin << 'EOF'` with `# Title` + body |
+```bash
+npx intent-turso ticket create --stdin << 'EOF'
+# [INT-YYYYMMDD-HHMMSS] Title
+...body...
+EOF
+```
 
 ### Capture Steps
 
@@ -81,20 +97,6 @@ Body:
    - If "Just create ticket" → stop here
 
 ## Step 4: Plan
-
-### Hard Rules (BLOCKING)
-
-Plan MUST NOT:
-- Restate Intent, Context, Constraints, Change Class, or Scope
-- Introduce new Tasks or Definition of Done
-- Explain *what* the feature is
-
-Plan MUST ONLY:
-- Describe HOW to implement existing Ticket Tasks
-- Describe HOW to verify existing DoD items
-
-> If content could be copied into the Ticket without loss → it does NOT belong in the Plan.
-> Violating this = Plan rejection.
 
 ### Plan Format
 
@@ -114,13 +116,15 @@ Plan MUST ONLY:
 **Decisions:** (implementation-level only, not ticket decisions)
 - choice: What | reason: Why
 
-**Defaults Assumed:** (omit if none)
-- Default 1
-- Default 2
+**Trade-offs:** (omit if none)
+- considered: [alternative] | rejected: [reason]
+- limitation: [what might break at scale]
 
-**Irreversible Actions:** (omit if none)
-- Migration: description
-- Deletion: description
+**Irreversible Actions:** (required for Class C, omit if none for A/B)
+- Description of action that can't be undone
+
+**Edge Cases:** (required for Class C, omit if none for A/B)
+- Condition that might cause issues
 ```
 
 ### Plan Steps
@@ -129,8 +133,8 @@ Plan MUST ONLY:
 2. Output plan using format above
 3. `AskUserQuestion`: "Approve this plan?" → Yes, continue | Revise | Cancel
 4. **Wait for approval before saving**
-5. After approval:
-   - Save plan (Turso): `npx intent-turso ticket update <id> --plan-stdin`
+5. After approval (MANDATORY before ExitPlanMode):
+   - **ALWAYS** save plan: `npx intent-turso ticket update <id> --plan-stdin`
    - If "Cancel" → stop here
 6. `ExitPlanMode`
 
@@ -150,11 +154,9 @@ Stop if: Class C or irreversible changes.
 2. Run code checks (test, lint, typecheck, build)
 3. Fix failures → re-run
 4. `AskUserQuestion`: "Implementation complete. Please review." → Approve | Request changes
-5. After approval (one command):
-   - Turso: `npx intent-turso ticket update <id> --status "Done" --complete-all`
-   - Linear: `mcp__linear__update_issue` with state + update description checkboxes
+5. After approval: `npx intent-turso ticket update <id> --status "Done" --complete-all`
 
-## Step 7: Knowledge Extraction (Turso only)
+## Step 7: Knowledge Extraction
 
 **Auto-extract:** When status is set to "Done", the update response includes `extractProposals`.
 
@@ -169,7 +171,9 @@ npx intent-turso knowledge create --stdin << 'EOF'
 
 **Namespace:** project-name
 **Category:** pattern|truth|principle|architecture
-**Origin Type:** ticket|discovery|manual
+**Source:** ticket|discovery|manual
+**Origin Ticket:** INT-YYYYMMDD-HHMMSS (if source=ticket)
+**Origin Ticket Type:** feature|bugfix|refactor|docs|chore|test (if source=ticket)
 **Confidence:** 0.8
 **Scope:** new-only|global|backward-compatible|legacy-frozen
 **Tags:** tag1, tag2
@@ -193,19 +197,7 @@ Ask: "Any patterns to add to CLAUDE.md?"
 
 ---
 
-## Reference: Adapter Commands
-
-### Linear
-
-| Action | Tool |
-|--------|------|
-| Create | `mcp__linear__create_issue` |
-| Fetch | `mcp__linear__get_issue` |
-| Update | `mcp__linear__update_issue` |
-| Comment | `mcp__linear__create_comment` |
-| List | `mcp__linear__list_issues` |
-
-### Turso
+## Reference: Commands
 
 | Action | Command |
 |--------|---------|
@@ -217,7 +209,7 @@ Ask: "Any patterns to add to CLAUDE.md?"
 | Complete selective | `npx intent-turso ticket update <id> --complete-task 0,1 --complete-dod 0,2` |
 | Comment | `npx intent-turso ticket update <id> --comment '<text>'` |
 | List | `npx intent-turso ticket list [--status <status>]` |
-| Search | `npx intent-turso search "<query>" --limit 5` |
+| Search | `npx intent-turso search "<query>" --limit 5 [--ticket-type <type>]` |
 | Extract | `npx intent-turso extract <ticket-id>` |
 | Recalculate confidence | `npx intent-turso knowledge recalculate [--dry-run]` |
 

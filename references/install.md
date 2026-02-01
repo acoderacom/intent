@@ -1,52 +1,8 @@
-# MCP Install Guides
+# Turso Prerequisites
 
-Show only when MCP tool call fails with "tool not found".
+Run once per machine. If `npx intent-turso --version` works, skip this.
 
-## Linear
-
-Add to `~/.claude/settings.json`:
-
-```json
-{
-  "mcpServers": {
-    "linear": {
-      "command": "npx",
-      "args": ["-y", "@linear/mcp-server"],
-      "env": {
-        "LINEAR_API_KEY": "<key>"
-      }
-    }
-  }
-}
-```
-
-Get key: Linear → Settings → API → Personal API keys
-
-Restart Claude Code after adding.
-
-## Asana
-
-Run this command:
-
-```bash
-claude mcp add --transport sse asana https://mcp.asana.com/sse
-```
-
-This uses Asana's hosted MCP server with OAuth authentication. You'll be prompted to authorize when first using Asana tools.
-
-Restart Claude Code after adding.
-
-## Turso
-
-### 1. Install CLI
-
-```bash
-npm install -g intent-turso
-```
-
-Or use via npx: `npx intent-turso --version`
-
-### 2. Get Credentials
+## 1. Get Turso Credentials
 
 **Option A: Turso Dashboard**
 1. Create database at https://turso.tech (free tier)
@@ -61,31 +17,10 @@ turso db show intent-db --url        # Copy this
 turso db tokens create intent-db     # Copy this
 ```
 
-### 3. Create `.intent/.env`
+## 2. Verify CLI
 
 ```bash
-mkdir -p .intent
+npx intent-turso --version
 ```
 
-Create `.intent/.env` manually (do NOT paste credentials in AI chat):
-
-```env
-TURSO_URL="libsql://your-db.turso.io"
-TURSO_AUTH_TOKEN="your-token"
-```
-
-### 4. Initialize Database
-
-```bash
-intent-turso init
-```
-
-Creates tables if they don't exist.
-
-### 5. Verify
-
-```bash
-intent-turso ticket list
-```
-
-**Security:** Add `.intent/.env` to `.gitignore`
+If this works, return to `/intent:setup` for project configuration.
