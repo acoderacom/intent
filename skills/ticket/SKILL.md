@@ -76,9 +76,34 @@ Body:
 ## Step 4: Plan
 
 1. Fetch ticket, `EnterPlanMode`
-2. Surface: **Decisions** (choices + why) | **Defaults** (assumed) | **Irreversible** (migrations, deletions)
+2. Build plan from ticket structure:
+   - **Files:** List files to modify
+   - **Tasks → Steps:** For EACH ticket task, add implementation steps
+   - **DoD → Verification:** For EACH ticket DoD, specify how to verify
+   - **Decisions:** Choices made (what + why), defaults assumed, irreversible actions
 3. By class: A = auto | B = propose | C = explicit approval
-4. Exit when approved
+4. After approval, save plan (Turso):
+   ```bash
+   npx intent-turso ticket update <id> --plan-stdin << 'EOF'
+   **Files:** file1.ts, file2.ts
+
+   **Tasks → Steps:**
+   - task: Implement API endpoint
+     - Create route handler
+     - Add validation
+   - task: Add unit tests
+     - Test success case
+     - Test error handling
+
+   **DoD → Verification:**
+   - dod: API returns correct data | verify: Run integration tests
+   - dod: No TypeScript errors | verify: npx tsc --noEmit
+
+   **Decisions:**
+   - choice: Use cursor pagination | reason: Better for large datasets
+   EOF
+   ```
+6. `ExitPlanMode`
 
 Stop if: Class C or irreversible changes.
 
@@ -100,8 +125,10 @@ Stop if: Class C or irreversible changes.
 
 ## Step 7: Knowledge Extraction (Turso only)
 
-1. Run `npx intent-turso extract {ticket-id}`
-2. Parse JSON, present proposals to user:
+**Auto-extract:** When status is set to "Done", the update response includes `extractProposals`.
+
+1. Parse `extractProposals` from the update response (no separate command needed)
+2. Present proposals to user:
    - `AskUserQuestion`: "Extract this knowledge?" → Accept all | Select items | Skip
 3. For accepted items, create via heredoc:
 
@@ -154,12 +181,14 @@ Ask: "Any patterns to add to CLAUDE.md?"
 | Create | `npx intent-turso ticket create --stdin` (heredoc) |
 | Fetch | `npx intent-turso ticket get <id>` |
 | Update status | `npx intent-turso ticket update <id> --status <status>` |
+| Save plan | `npx intent-turso ticket update <id> --plan-stdin` (heredoc) |
 | Complete all | `npx intent-turso ticket update <id> --status "Done" --complete-all` |
 | Complete selective | `npx intent-turso ticket update <id> --complete-task 0,1 --complete-dod 0,2` |
 | Comment | `npx intent-turso ticket update <id> --comment '<text>'` |
 | List | `npx intent-turso ticket list [--status <status>]` |
 | Search | `npx intent-turso search "<query>" --limit 5` |
 | Extract | `npx intent-turso extract <ticket-id>` |
+| Recalculate confidence | `npx intent-turso knowledge recalculate [--dry-run]` |
 
 ### Status Values
 

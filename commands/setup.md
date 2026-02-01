@@ -61,7 +61,7 @@ Get credentials: https://turso.tech or turso CLI"
    ```json
    {
      "permissions": {
-       "allow": ["Bash(npx intent-turso:*)"]
+       "allow": ["Bash(npx intent-turso *)"]
      }
    }
    ```
