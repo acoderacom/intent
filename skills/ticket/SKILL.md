@@ -15,18 +15,15 @@ Turn user intent into validated tickets. AI executes, human reviews, knowledge c
 2. If missing → `/intent:setup` first
 3. **No config = no proceed**
 
-## Step 1: Context
+## Step 1: Context (search only)
 
-Read `CLAUDE.md`, check project state.
+Read `CLAUDE.md`. Search knowledge → `npx intent-turso search "<intent>" --limit 3`
 
-Search knowledge → `npx intent-turso search "<intent>" --limit 3`
-Include relevant knowledge in the ticket's Context field.
-Use `--ticket-type` filter when intent matches a specific type (e.g., bugfix intent → search bugfix knowledge).
+Use `--ticket-type` filter when intent matches a specific type.
 
-**Semantic Search Notes:**
-- Scores in 0.35–0.65 range are useful (relative, not absolute)
-- ≥0.45 = relevant | ≥0.55 = strong match
-- Do NOT discard results solely due to low absolute score
+**Semantic Search:** ≥0.45 relevant, ≥0.55 strong. Don't discard low scores.
+
+**Do NOT explore codebase yet** - knowledge informs exploration strategy in Step 3.
 
 ## Step 2: Clarify
 
@@ -103,14 +100,15 @@ EOF
 
 ### Steps
 
-1. Explore codebase, output Ticket using format above
-2. Confirm by Change Class:
+1. **NOW explore codebase** (knowledge found → start from patterns/files, else broad)
+2. Output Ticket using format above
+3. Confirm by Change Class:
    - **Class A** → auto-create ticket, proceed to execute
    - **Class B/C** → `AskUserQuestion`: "Create ticket and approve plan?" (Class C: note explicit approval required)
      - Yes, continue → create ticket, proceed to execute
      - Just create ticket → create ticket only, stop
      - Revise → adjust based on feedback
-3. After confirm (or auto for Class A):
+4. After confirm (or auto for Class A):
    - Create ticket using command above
    - Create tasks from ticket's **Tasks** via `TaskCreate`, set dependencies via `TaskUpdate`
 
