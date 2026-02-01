@@ -7,6 +7,8 @@ description: Create and execute development tickets. Triggers on "I want...", "A
 
 Turn user intent into validated tickets, AI execute - Human review.
 
+> **Mental Model:** Ticket = Contract (WHAT & WHY) | Plan = Playbook (HOW)
+
 ## Prerequisites (BLOCKING)
 
 1. Read `CLAUDE.md` for `## Intent Config`
@@ -19,6 +21,11 @@ Read `CLAUDE.md`, check project state.
 
 **Turso only**: Search knowledge → `npx intent-turso search "<intent>" --limit 3`
 Include relevant knowledge in the ticket's Context field.
+
+**Semantic Search Notes:**
+- Scores in 0.35–0.65 range are useful (relative, not absolute)
+- ≥0.45 = relevant | ≥0.55 = strong match
+- Do NOT discard results solely due to low absolute score
 
 ## Step 2: Clarify
 
@@ -75,35 +82,59 @@ Body:
 
 ## Step 4: Plan
 
+### Hard Rules (BLOCKING)
+
+Plan MUST NOT:
+- Restate Intent, Context, Constraints, Change Class, or Scope
+- Introduce new Tasks or Definition of Done
+- Explain *what* the feature is
+
+Plan MUST ONLY:
+- Describe HOW to implement existing Ticket Tasks
+- Describe HOW to verify existing DoD items
+
+> If content could be copied into the Ticket without loss → it does NOT belong in the Plan.
+> Violating this = Plan rejection.
+
+### Plan Format
+
+```markdown
+**Files to Edit:** file1.ts, file2.ts
+
+**Tasks → Steps:**
+- task: [ticket task 1]
+  - Implementation step
+- task: [ticket task 2]
+  - Implementation step
+
+**DoD → Verification:**
+- dod: [ticket DoD 1] | verify: How to verify
+- dod: [ticket DoD 2] | verify: How to verify
+
+**Decisions:** (implementation-level only, not ticket decisions)
+- choice: What | reason: Why
+
+**Defaults Assumed:** (omit if none)
+- Default 1
+- Default 2
+
+**Irreversible Actions:** (omit if none)
+- Migration: description
+- Deletion: description
+```
+
+### Plan Steps
+
 1. Fetch ticket, `EnterPlanMode`
-2. Build plan from ticket structure:
-   - **Files:** List files to modify
-   - **Tasks → Steps:** For EACH ticket task, add implementation steps
-   - **DoD → Verification:** For EACH ticket DoD, specify how to verify
-   - **Decisions:** Choices made (what + why), defaults assumed, irreversible actions
-3. By class: A = auto | B = propose | C = explicit approval
-4. After approval, save plan (Turso):
-   ```bash
-   npx intent-turso ticket update <id> --plan-stdin << 'EOF'
-   **Files:** file1.ts, file2.ts
-
-   **Tasks → Steps:**
-   - task: Implement API endpoint
-     - Create route handler
-     - Add validation
-   - task: Add unit tests
-     - Test success case
-     - Test error handling
-
-   **DoD → Verification:**
-   - dod: API returns correct data | verify: Run integration tests
-   - dod: No TypeScript errors | verify: npx tsc --noEmit
-
-   **Decisions:**
-   - choice: Use cursor pagination | reason: Better for large datasets
-   EOF
-   ```
+2. Output plan using format above
+3. `AskUserQuestion`: "Approve this plan?" → Yes, continue | Revise | Cancel
+4. **Wait for approval before saving**
+5. After approval:
+   - Save plan (Turso): `npx intent-turso ticket update <id> --plan-stdin`
+   - If "Cancel" → stop here
 6. `ExitPlanMode`
+
+By class: A = auto | B = propose | C = explicit approval
 
 Stop if: Class C or irreversible changes.
 
