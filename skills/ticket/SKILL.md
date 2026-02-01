@@ -76,22 +76,19 @@ Body:
 | `chore` | Update deps, migrate, config, CI/CD |
 | `test` | Test, spec, coverage, e2e |
 
-### How to Save
-
-```bash
-npx intent-turso ticket create --stdin << 'EOF'
-# [INT-YYYYMMDD-HHMMSS] Title
-...body...
-EOF
-```
-
 ### Capture Steps
 
 1. Preview ticket using format above
 2. `AskUserQuestion`: "Create this ticket?" → Yes, continue | Just create ticket | No, let me clarify
 3. **Wait for confirmation before creating anything**
 4. After confirm:
-   - Create ticket via adapter
+   - **ALWAYS** Create ticket:
+     ```bash
+     npx intent-turso ticket create --stdin << 'EOF'
+     # [INT-YYYYMMDD-HHMMSS] Title
+     ...body...
+     EOF
+     ```
    - Create tasks via `TaskCreate`
    - Set dependencies via `TaskUpdate`
    - If "Just create ticket" → stop here
