@@ -5,7 +5,7 @@ description: Create and execute development tickets. Triggers on "I want...", "A
 
 # Intent-First Development
 
-Turn user intent into validated tickets. AI executes, human reviews, knowledge compounds.
+Turn user intent into validated tickets, AI execute - Human review.
 
 **Mental Model:** Ticket = Contract (WHAT & WHY) | Plan = Playbook (HOW) | Knowledge = Memory (LEARNED)
 
@@ -34,13 +34,14 @@ Use `AskUserQuestion` - one question at a time, 2-4 options each. Focus on purpo
 
 Stop if: unclear after 2 questions, or needs explicit trade-off choice.
 
-## Step 3: Capture and Plan
+## Step 3: Capture
 
 ### Ticket Format
 
-```markdown
-# [INT-YYYYMMDD-HHMMSS] {intent summary}
+Title: `[INT-YYYYMMDD-HHMMSS] {intent summary}`
 
+Body:
+```markdown
 **Status:** Backlog
 
 **Type:** feature|bugfix|refactor|docs|chore|test (AI-inferred from intent)
@@ -62,9 +63,41 @@ Stop if: unclear after 2 questions, or needs explicit trade-off choice.
 - [ ] Criterion 2
 
 **Change Class:** A|B|C - [reason]
+```
 
-## Plan
+### Ticket Types (AI-inferred)
 
+| Type | Inferred From |
+|------|---------------|
+| `feature` | Add, create, build, implement, new |
+| `bugfix` | Fix, bug, error, broken, crash, fail |
+| `refactor` | Refactor, restructure, clean up, optimize |
+| `docs` | Document, readme, comment, explain |
+| `chore` | Update deps, migrate, config, CI/CD |
+| `test` | Test, spec, coverage, e2e |
+
+### Capture Steps
+
+1. Preview ticket using format above
+2. `AskUserQuestion`: "Create this ticket?" → Yes, continue | Just create ticket | No, let me clarify
+3. **Wait for confirmation before creating anything**
+4. After confirm:
+   - **ALWAYS** Create ticket:
+     ```bash
+     npx intent-turso ticket create --stdin << 'EOF'
+     # [INT-YYYYMMDD-HHMMSS] Title
+     ...body...
+     EOF
+     ```
+   - Create tasks via `TaskCreate`
+   - Set dependencies via `TaskUpdate`
+   - If "Just create ticket" → stop here
+
+## Step 4: Plan
+
+### Plan Format
+
+```markdown
 **Files to Edit:** file1.ts, file2.ts
 
 **Tasks → Steps:**
@@ -91,36 +124,28 @@ Stop if: unclear after 2 questions, or needs explicit trade-off choice.
 - Condition that might cause issues
 ```
 
-### Create Ticket
+### Plan Steps
 
-```bash
-npx intent-turso ticket create --stdin << 'EOF'
-# [INT-YYYYMMDD-HHMMSS] {intent summary}
-**Status:** Backlog
-...full ticket content including ## Plan section...
-EOF
-```
+1. Fetch ticket, `EnterPlanMode`
+2. Output plan using format above
+3. `AskUserQuestion`: "Approve this plan?" → Yes, continue | Revise | Cancel
+4. **Wait for approval before saving**
+5. After approval (MANDATORY before ExitPlanMode):
+   - **ALWAYS** save plan: `npx intent-turso ticket update <id> --plan-stdin`
+   - If "Cancel" → stop here
+6. `ExitPlanMode`
 
-### Steps
+By class: A = auto | B = propose | C = explicit approval
 
-1. Explore codebase, output Ticket using format above
-2. Confirm by Change Class:
-   - **Class A** → auto-create ticket, proceed to execute
-   - **Class B/C** → `AskUserQuestion`: "Create ticket and approve plan?" (Class C: note explicit approval required)
-     - Yes, continue → create ticket, proceed to execute
-     - Just create ticket → create ticket only, stop
-     - Revise → adjust based on feedback
-3. After confirm (or auto for Class A):
-   - Create ticket using command above
-   - Create tasks from ticket's **Tasks** via `TaskCreate`, set dependencies via `TaskUpdate`
+Stop if: Class C or irreversible changes.
 
-## Step 4: Execute
+## Step 5: Execute
 
 1. Update ticket status to `In Progress`
 2. For each task: `TaskUpdate` → `in_progress` → implement → `completed`
 3. Use `TaskList` for next task
 
-## Step 5: Review (MANDATORY)
+## Step 6: Review (MANDATORY)
 
 1. Set status to `In Review`
 2. Run code checks (test, lint, typecheck, build)
@@ -128,11 +153,17 @@ EOF
 4. `AskUserQuestion`: "Implementation complete. Please review." → Approve | Request changes
 5. After approval: `npx intent-turso ticket update <id> --status "Done" --complete-all`
 
-## Step 6: Knowledge Extraction
+## Step 7: Knowledge Extraction
 
-### Knowledge Format
+**Auto-extract:** When status is set to "Done", the update response includes `extractProposals`.
 
-```markdown
+1. Parse `extractProposals` from the update response (no separate command needed)
+2. Present proposals to user:
+   - `AskUserQuestion`: "Extract this knowledge?" → Accept all | Select items | Skip
+3. For accepted items, create via heredoc:
+
+```bash
+npx intent-turso knowledge create --stdin << 'EOF'
 # Knowledge Title
 
 **Namespace:** project-name
@@ -154,38 +185,23 @@ When:
 
 Pattern:
 [The approach]
-```
-
-### Create Knowledge
-
-```bash
-npx intent-turso knowledge create --stdin << 'EOF'
-...knowledge content...
 EOF
 ```
 
-### Steps
-
-1. Review `extractProposals` from Step 5's "Done" response
-2. `AskUserQuestion`: "Extract this knowledge?" → Accept all | Select items | Skip
-3. For accepted items, create using command above
-
-## Step 7: Capture Patterns to CLAUDE.md
+## Step 8: Capture Patterns to CLAUDE.md
 
 Ask: "Any patterns to add to CLAUDE.md?"
 
 ---
 
-## Reference
-
-### Commands
+## Reference: Commands
 
 | Action | Command |
 |--------|---------|
 | Create | `npx intent-turso ticket create --stdin` (heredoc) |
 | Fetch | `npx intent-turso ticket get <id>` |
 | Update status | `npx intent-turso ticket update <id> --status <status>` |
-| Update plan | `npx intent-turso ticket update <id> --plan-stdin` (heredoc) |
+| Save plan | `npx intent-turso ticket update <id> --plan-stdin` (heredoc) |
 | Complete all | `npx intent-turso ticket update <id> --status "Done" --complete-all` |
 | Complete selective | `npx intent-turso ticket update <id> --complete-task 0,1 --complete-dod 0,2` |
 | Comment | `npx intent-turso ticket update <id> --comment '<text>'` |
@@ -198,18 +214,9 @@ Ask: "Any patterns to add to CLAUDE.md?"
 
 `Backlog` → `In Progress` → `In Review` → `Done`
 
-### Ticket Types
+---
 
-| Type | Inferred From |
-|------|---------------|
-| `feature` | Add, create, build, implement, new |
-| `bugfix` | Fix, bug, error, broken, crash, fail |
-| `refactor` | Refactor, restructure, clean up, optimize |
-| `docs` | Document, readme, comment, explain |
-| `chore` | Update deps, migrate, config, CI/CD |
-| `test` | Test, spec, coverage, e2e |
-
-### Change Classes
+## Change Classes
 
 | Class | Examples | Action |
 |-------|----------|--------|
