@@ -1,3 +1,5 @@
 .DS_Store
 .claude
 intent-turso
+.intent/.env
+.intent/*.db
