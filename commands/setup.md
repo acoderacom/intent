@@ -109,4 +109,4 @@ Append to project's `CLAUDE.md`:
 
 ## Step 7: Confirm
 
-Say: "Intent configured. Use `/intent:ticket` to create tickets."
+Say: "Intent configured. Use `/intent:new` to create tickets."
