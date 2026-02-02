@@ -1,6 +1,5 @@
 ---
 description: Capture knowledge from codebase exploration ("learn how...", "document how...", "how does X work")
-disable-model-invocation: true
 ---
 
 # Knowledge Discovery
