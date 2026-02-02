@@ -102,15 +102,13 @@ Append to project's `CLAUDE.md`:
 | Complete selective | `npx intent-turso ticket update <id> --complete-task 0,1 --complete-dod 0,2` |
 | Comment | `npx intent-turso ticket update <id> --comment '<text>'` |
 | List | `npx intent-turso ticket list [--status <status>]` |
-| Search | `npx intent-turso search "<query>" --limit 5 [--ticket-type <type>]` |
-| Extract | `npx intent-turso extract <ticket-id>` |
-| Recalculate confidence | `npx intent-turso knowledge recalculate [--dry-run]` |
 
 ### Knowledge Operations
 | Action | Command |
 |--------|---------|
-| Extract | `npx intent-turso extract {ticket-id}` |
-| Search | `npx intent-turso search "{query}"` |
+| Search | `npx intent-turso search "<query>" --limit 5 [--ticket-type <type>]` |
+| Extract | `npx intent-turso extract <ticket-id>` |
+| Recalculate confidence | `npx intent-turso knowledge recalculate [--dry-run]` |
 ```
 
 ## Step 7: Confirm
