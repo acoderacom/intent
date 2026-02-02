@@ -5,8 +5,8 @@ set -euo pipefail
 input=$(cat)
 command=$(echo "$input" | jq -r '.tool_input.command')
 
-# Auto-approve intent-turso commands (including heredocs)
-if [[ "$command" =~ ^npx\ intent-turso ]]; then
+# Auto-approve intent-turso commands (including heredocs piped to intent-turso)
+if [[ "$command" =~ npx\ intent-turso ]]; then
   jq -n '{
     hookSpecificOutput: {
       hookEventName: "PreToolUse",

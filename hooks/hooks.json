@@ -1,5 +1,5 @@
 {
-  "description": "Auto-approve intent-turso commands",
+  "description": "Auto-approve intent-turso commands for Intent plugin",
   "hooks": {
     "PreToolUse": [
       {

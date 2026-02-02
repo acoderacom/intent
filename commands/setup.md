@@ -15,19 +15,13 @@ If fails → guide user to [install.md](../references/install.md), then return h
 ## Step 2: Choose Database Mode
 
 `AskUserQuestion`: "Where to store Intent data?"
-- **Local (Recommended)** → SQLite file in `.intent/local.db`, no account needed
+- **Local (Recommended)** → Turso database in `.intent/local.db`, no account needed
 - **Cloud** → Turso Cloud, requires account and credentials
 
 ## Step 3: Create Config
 
 ```bash
-mkdir -p .intent
-```
-
-Add to `.gitignore`:
-```bash
-echo ".intent/.env" >> .gitignore
-echo ".intent/*.db" >> .gitignore
+mkdir -p .intent && echo -e ".intent/.env\n.intent/*.db" >> .gitignore
 ```
 
 ### If Local:
@@ -39,8 +33,9 @@ npx intent-turso init --url "file:.intent/local.db"
 
 ### If Cloud:
 
-Tell user to create `.intent/.env` manually with their credentials:
+Guide user to get Turso credentials via https://turso.tech (free tier) or Turso CLI.
 
+Then tell user to create `.intent/.env` with:
 ```env
 TURSO_URL="libsql://your-db.turso.io"
 TURSO_AUTH_TOKEN="your-token"
@@ -66,10 +61,12 @@ Check if `.claude/settings.local.json` exists, then add permission:
 ```json
 {
   "permissions": {
-    "allow": ["Bash(npx intent-turso *)"]
+    "allow": ["Bash(npx intent-turso:*)"]
   }
 }
 ```
+
+**Note:** The Intent plugin's `hooks/hooks.json` automatically handles auto-approval for `npx intent-turso` commands via `${CLAUDE_PLUGIN_ROOT}`.
 
 ## Step 6: Write CLAUDE.md
 
