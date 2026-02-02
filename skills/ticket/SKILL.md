@@ -25,6 +25,8 @@ Use `--ticket-type` filter when intent matches a specific type.
 
 **Do NOT explore codebase yet** - knowledge informs exploration strategy in Step 3.
 
+**Quick mode check:** If intent is simple (single file, obvious fix, low risk) → suggest `/ticket-quick` instead.
+
 ## Step 2: Clarify
 
 Use `AskUserQuestion` - one question at a time, 2-4 options each. Focus on purpose, constraints, definition of done. For multiple approaches lead with recommended option, explain trade-offs in descriptions.

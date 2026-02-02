@@ -17,38 +17,63 @@ Explore codebase → capture understanding → save as searchable knowledge.
 
 Use Task tool with `subagent_type=Explore` to understand the topic.
 
+**Parallel exploration:** For complex topics, run multiple Explore agents in parallel (one message, multiple Task calls) - e.g., explore architecture + explore patterns + explore usage.
+
 ## Step 2: Capture
 
-1. Preview (single output):
+### Knowledge Format
 
 ```markdown
 # {Title}
 
 **Namespace:** {project-namespace}
-**Category:** {architecture|pattern|truth|principle}
-**Origin Type:** discovery
-**Confidence:** {see table below}
-**Scope:** {global|new-only}
+**Category:** architecture|pattern|truth|principle
+**Source:** discovery
+**Confidence:** {see Confidence Defaults}
+**Scope:** global|new-only
 **Tags:** {kebab-case, comma-separated}
 
 ## Content
 
-{Use format from "Content Format by Category" section}
+{Use format from Content Format by Category}
 ```
 
-2. `AskUserQuestion`: "Save this knowledge?" → Yes | Edit | Cancel
-3. **Wait for confirmation before creating anything**
-
-After confirm:
-4. Pipe the previewed markdown to CLI:
+### Create Knowledge
 
 ```bash
 npx intent-turso knowledge create --stdin << 'EOF'
-{paste previewed markdown here}
+...knowledge content...
 EOF
 ```
 
-## Content Format by Category
+### Steps
+
+1. Preview knowledge using format above
+2. `AskUserQuestion`: "Save this knowledge?" → Yes | Edit | Cancel
+3. After confirm, create using command above
+
+---
+
+## Reference
+
+### Commands
+
+| Action | Command |
+|--------|---------|
+| Create | `npx intent-turso knowledge create --stdin` |
+| Search | `npx intent-turso search "<query>" --limit 5` |
+| Recalculate | `npx intent-turso knowledge recalculate [--dry-run]` |
+
+### Confidence Defaults
+
+| Category | Default |
+|----------|---------|
+| Truth | 0.9 |
+| Architecture | 0.85 |
+| Pattern | 0.8 |
+| Principle | 0.75 |
+
+### Content Format by Category
 
 **Architecture:**
 ```
@@ -94,12 +119,3 @@ Why:
 Applies:
 {scope}
 ```
-
-## Confidence Defaults
-
-| Category | Default |
-|----------|---------|
-| Truth | 0.9 |
-| Architecture | 0.85 |
-| Pattern | 0.8 |
-| Principle | 0.75 |
