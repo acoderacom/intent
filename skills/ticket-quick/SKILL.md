@@ -14,6 +14,8 @@ Skip ceremony, preserve knowledge. For confident, low-risk changes.
 
 Search knowledge → `npx intent-turso search "<intent>" --limit 3`
 
+Use `--ticket-type` filter when intent matches a specific type.
+
 **Semantic Search:** ≥0.45 relevant, ≥0.55 strong. Don't discard low scores.
 
 **Do NOT explore codebase yet** - knowledge informs exploration in Step 2.
@@ -34,25 +36,18 @@ Search knowledge → `npx intent-turso search "<intent>" --limit 3`
 ### Knowledge Format
 
 ```markdown
-# Knowledge Title
+# {Title}
 
-**Namespace:** project-name
-**Category:** pattern|truth|principle
+**Namespace:** {project-namespace}
+**Category:** architecture|pattern|truth|principle
 **Source:** discovery
-**Confidence:** 0.7
-**Scope:** new-only
-**Tags:** quick-fix
+**Confidence:** {see Confidence Defaults}
+**Scope:** new-only|global|backward-compatible|legacy-frozen
+**Tags:** {kebab-case, comma-separated}
 
 ## Content
 
-Why:
-[Rationale]
-
-When:
-[Conditions]
-
-Pattern:
-[The approach]
+{Use format from Content Format by Category}
 ```
 
 ### Create Knowledge
@@ -91,3 +86,59 @@ EOF
 | Code checks | ✓ | ✓ |
 | Human review | ✗ | ✓ (mandatory) |
 | Knowledge extract | ✓ (optional) | ✓ |
+
+### Confidence Defaults
+
+| Category | Default |
+|----------|---------|
+| Truth | 0.9 |
+| Architecture | 0.85 |
+| Pattern | 0.8 |
+| Principle | 0.75 |
+
+### Content Format by Category
+
+**Architecture:**
+```
+Component:
+{name}
+
+Responsibility:
+{what it does}
+
+Interfaces:
+{how to interact}
+```
+
+**Pattern:**
+```
+Why:
+{rationale}
+
+When:
+{conditions to apply}
+
+Pattern:
+{the approach}
+```
+
+**Truth:**
+```
+Fact:
+{verified fact}
+
+Verified:
+{how/where verified}
+```
+
+**Principle:**
+```
+Rule:
+{the rule}
+
+Why:
+{rationale}
+
+Applies:
+{scope}
+```

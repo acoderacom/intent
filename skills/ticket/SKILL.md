@@ -31,7 +31,7 @@ Use `--ticket-type` filter when intent matches a specific type.
 
 Use `AskUserQuestion` - one question at a time, 2-4 options each. Focus on purpose, constraints, definition of done. For multiple approaches lead with recommended option, explain trade-offs in descriptions.
 
-Stop if: unclear after 2 questions, or needs explicit trade-off choice.
+Be ready to go back and clarify if something doesn't make sense.
 
 ## Step 3: Capture and Plan
 
@@ -105,7 +105,7 @@ EOF
 1. **NOW explore codebase** (knowledge found → start from patterns/files, else broad)
 2. Output Ticket using format above
 3. Confirm by Change Class:
-   - **Class A** → auto-create ticket, proceed to execute
+   - **Class A** → auto create ticket, proceed to execute
    - **Class B/C** → `AskUserQuestion`: "Create ticket and approve plan?" (Class C: note explicit approval required)
      - Yes, continue → create ticket, proceed to execute
      - Just create ticket → create ticket only, stop
@@ -122,7 +122,7 @@ EOF
 
 ## Step 5: Review (MANDATORY)
 
-1. Set status to `In Review`
+1. Update ticket status to `In Review`
 2. Run code checks (test, lint, typecheck, build)
 3. Fix failures → re-run
 4. `AskUserQuestion`: "Implementation complete. Please review." → Approve | Request changes
@@ -133,27 +133,20 @@ EOF
 ### Knowledge Format
 
 ```markdown
-# Knowledge Title
+# {Title}
 
-**Namespace:** project-name
-**Category:** pattern|truth|principle|architecture
-**Source:** ticket|discovery|manual
-**Origin Ticket:** INT-YYYYMMDD-HHMMSS (if source=ticket)
-**Origin Ticket Type:** feature|bugfix|refactor|docs|chore|test (if source=ticket)
-**Confidence:** 0.8
+**Namespace:** {project-namespace}
+**Category:** architecture|pattern|truth|principle
+**Source:** ticket
+**Origin Ticket:** {ticket-id}
+**Origin Ticket Type:** {ticket-type}
+**Confidence:** {see Confidence Defaults}
 **Scope:** new-only|global|backward-compatible|legacy-frozen
-**Tags:** tag1, tag2
+**Tags:** {kebab-case, comma-separated}
 
 ## Content
 
-Why:
-[Rationale]
-
-When:
-[Conditions]
-
-Pattern:
-[The approach]
+{Use format from Content Format by Category}
 ```
 
 ### Create Knowledge
@@ -216,3 +209,59 @@ Ask: "Any patterns to add to CLAUDE.md?"
 | A | Single file, tests, docs | Auto |
 | B | Cross-module, APIs, deps | Propose |
 | C | Schema, auth, payments | Approval |
+
+### Confidence Defaults
+
+| Category | Default |
+|----------|---------|
+| Truth | 0.9 |
+| Architecture | 0.85 |
+| Pattern | 0.8 |
+| Principle | 0.75 |
+
+### Content Format by Category
+
+**Architecture:**
+```
+Component:
+{name}
+
+Responsibility:
+{what it does}
+
+Interfaces:
+{how to interact}
+```
+
+**Pattern:**
+```
+Why:
+{rationale}
+
+When:
+{conditions to apply}
+
+Pattern:
+{the approach}
+```
+
+**Truth:**
+```
+Fact:
+{verified fact}
+
+Verified:
+{how/where verified}
+```
+
+**Principle:**
+```
+Rule:
+{the rule}
+
+Why:
+{rationale}
+
+Applies:
+{scope}
+```
