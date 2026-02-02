@@ -12,12 +12,32 @@ npx intent-turso --version
 
 If fails → guide user to [install.md](../references/install.md), then return here.
 
-## Step 2: Create `.intent/.env`
+## Step 2: Choose Database Mode
+
+`AskUserQuestion`: "Where to store Intent data?"
+- **Local (Recommended)** → SQLite file in `.intent/local.db`, no account needed
+- **Cloud** → Turso Cloud, requires account and credentials
+
+## Step 3: Create Config
 
 ```bash
 mkdir -p .intent
-echo ".intent/.env" >> .gitignore
 ```
+
+Add to `.gitignore`:
+```bash
+echo ".intent/.env" >> .gitignore
+echo ".intent/*.db" >> .gitignore
+```
+
+### If Local:
+
+Create `.intent/.env` automatically:
+```bash
+npx intent-turso init --url "file:.intent/local.db"
+```
+
+### If Cloud:
 
 Tell user to create `.intent/.env` manually with their credentials:
 
@@ -28,16 +48,18 @@ TURSO_AUTH_TOKEN="your-token"
 
 **IMPORTANT:** Do NOT ask for credentials in chat. User must create file manually.
 
-## Step 3: Initialize Database
-
 After user confirms `.env` created:
-
 ```bash
 npx intent-turso init
+```
+
+## Step 4: Verify
+
+```bash
 npx intent-turso ticket list
 ```
 
-## Step 4: Add Permissions
+## Step 5: Add Permissions
 
 Check if `.claude/settings.local.json` exists, then add permission:
 
@@ -49,15 +71,26 @@ Check if `.claude/settings.local.json` exists, then add permission:
 }
 ```
 
-## Step 5: Write CLAUDE.md
+## Step 6: Write CLAUDE.md
 
 Append to project's `CLAUDE.md`:
 
+### If Local:
+```markdown
+## Intent Config
+- Task Manager: Turso
+- Database: Local SQLite (`.intent/local.db`)
+```
+
+### If Cloud:
 ```markdown
 ## Intent Config
 - Task Manager: Turso
 - Database: Turso Cloud (configured via `.intent/.env`)
+```
 
+### Both modes - add adapter:
+```markdown
 ### Adapter
 | Action | Command |
 |--------|---------|
@@ -74,6 +107,6 @@ Append to project's `CLAUDE.md`:
 | Search | `npx intent-turso search "{query}"` |
 ```
 
-## Step 6: Confirm
+## Step 7: Confirm
 
 Say: "Intent configured. Use `/intent:ticket` to create tickets."
