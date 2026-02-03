@@ -31,7 +31,7 @@
 | Extract | `npx intent-turso extract <ticket-id>` |
 | Create | `npx intent-turso knowledge create --stdin` (heredoc) |
 | Get | `npx intent-turso knowledge get <id>` |
-| List | `npx intent-turso knowledge list [--category <cat>] [--active]` |
-| Update | `npx intent-turso knowledge update <id> --stdin` (heredoc) |
+| List | `npx intent-turso knowledge list [--category <cat>] [--active-only]` |
+| Update | `npx intent-turso knowledge update <id> [--title] [--content] [--category] [--tags]` |
 | Deactivate | `npx intent-turso knowledge deactivate <id>` |
 | Recalculate | `npx intent-turso knowledge recalculate [--dry-run]` |

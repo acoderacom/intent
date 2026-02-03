@@ -99,7 +99,7 @@ Append to project's `CLAUDE.md`:
 | Action | Command |
 |--------|---------|
 | Create | `npx intent-turso ticket create --stdin` (heredoc) |
-| Fetch | `npx intent-turso ticket get <id>` |
+| Get | `npx intent-turso ticket get <id>` |
 | Update status | `npx intent-turso ticket update <id> --status <status>` |
 | Update plan | `npx intent-turso ticket update <id> --plan-stdin` (heredoc) |
 | Complete all | `npx intent-turso ticket update <id> --status "Done" --complete-all` |
@@ -115,8 +115,8 @@ Append to project's `CLAUDE.md`:
 | Extract | `npx intent-turso extract <ticket-id>` |
 | Create | `npx intent-turso knowledge create --stdin` (heredoc) |
 | Get | `npx intent-turso knowledge get <id>` |
-| List | `npx intent-turso knowledge list [--category <cat>] [--active]` |
-| Update | `npx intent-turso knowledge update <id> --stdin` (heredoc) |
+| List | `npx intent-turso knowledge list [--category <cat>] [--active-only]` |
+| Update | `npx intent-turso knowledge update <id> [--title] [--content] [--category] [--tags]` |
 | Deactivate | `npx intent-turso knowledge deactivate <id>` |
 | Recalculate | `npx intent-turso knowledge recalculate [--dry-run]` |
 ```
