@@ -115,8 +115,8 @@ Append to project's `CLAUDE.md`:
 | Extract | `npx intent-turso extract <ticket-id>` |
 | Create | `npx intent-turso knowledge create --stdin` (heredoc) |
 | Get | `npx intent-turso knowledge get <id>` |
-| List | `npx intent-turso knowledge list [--category <cat>] [--active-only]` |
-| Update | `npx intent-turso knowledge update <id> [--title] [--content] [--category] [--tags]` |
+| List | `npx intent-turso knowledge list [--category <cat>] [--scope <scope>] [--source <source>] [--active-only]` |
+| Update | `npx intent-turso knowledge update <id> [--title] [--content] [--category] [--tags] [--scope]` |
 | Deactivate | `npx intent-turso knowledge deactivate <id>` |
 | Recalculate | `npx intent-turso knowledge recalculate [--dry-run]` |
 ```
