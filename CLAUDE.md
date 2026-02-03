@@ -4,6 +4,13 @@
 - Task Manager: Turso
 - Database: Local SQLite (`.intent/local.db`)
 
+### Setup Commands
+| Command | Description |
+|---------|-------------|
+| `npx intent-turso init` | Create database tables |
+| `npx intent-turso status` | Check Turso connection |
+| `npx intent-turso ui` | Start web UI |
+
 ### Adapter
 | Action | Command |
 |--------|---------|
@@ -22,4 +29,9 @@
 |--------|---------|
 | Search | `npx intent-turso search "<query>" --limit 5 [--ticket-type <type>]` |
 | Extract | `npx intent-turso extract <ticket-id>` |
-| Recalculate confidence | `npx intent-turso knowledge recalculate [--dry-run]` |
+| Create | `npx intent-turso knowledge create --stdin` (heredoc) |
+| Get | `npx intent-turso knowledge get <id>` |
+| List | `npx intent-turso knowledge list [--category <cat>] [--active]` |
+| Update | `npx intent-turso knowledge update <id> --stdin` (heredoc) |
+| Deactivate | `npx intent-turso knowledge deactivate <id>` |
+| Recalculate | `npx intent-turso knowledge recalculate [--dry-run]` |

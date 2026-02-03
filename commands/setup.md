@@ -86,9 +86,16 @@ Append to project's `CLAUDE.md`:
 - Database: Turso Cloud (configured via `.intent/.env`)
 ```
 
-### Both modes - add adapter:
+### Both modes - add commands:
 ```markdown
-### Adapter
+### Setup Commands
+| Command | Description |
+|---------|-------------|
+| `npx intent-turso init` | Create database tables |
+| `npx intent-turso status` | Check Turso connection |
+| `npx intent-turso ui` | Start web UI |
+
+### Ticket Operations
 | Action | Command |
 |--------|---------|
 | Create | `npx intent-turso ticket create --stdin` (heredoc) |
@@ -106,7 +113,12 @@ Append to project's `CLAUDE.md`:
 |--------|---------|
 | Search | `npx intent-turso search "<query>" --limit 5 [--ticket-type <type>]` |
 | Extract | `npx intent-turso extract <ticket-id>` |
-| Recalculate confidence | `npx intent-turso knowledge recalculate [--dry-run]` |
+| Create | `npx intent-turso knowledge create --stdin` (heredoc) |
+| Get | `npx intent-turso knowledge get <id>` |
+| List | `npx intent-turso knowledge list [--category <cat>] [--active]` |
+| Update | `npx intent-turso knowledge update <id> --stdin` (heredoc) |
+| Deactivate | `npx intent-turso knowledge deactivate <id>` |
+| Recalculate | `npx intent-turso knowledge recalculate [--dry-run]` |
 ```
 
 ## Step 7: Confirm

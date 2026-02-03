@@ -67,13 +67,6 @@ EOF
 
 ## Reference
 
-### Commands
-
-| Action | Command |
-|--------|---------|
-| Search | `npx intent-turso search "<query>" --limit 5` |
-| Create knowledge | `npx intent-turso knowledge create --stdin` |
-
 ### Quick vs Standard
 
 | Aspect | Quick | Standard |

@@ -55,14 +55,6 @@ EOF
 
 ## Reference
 
-### Commands
-
-| Action | Command |
-|--------|---------|
-| Create | `npx intent-turso knowledge create --stdin` |
-| Search | `npx intent-turso search "<query>" --limit 5` |
-| Recalculate | `npx intent-turso knowledge recalculate [--dry-run]` |
-
 ### Confidence Defaults
 
 | Category | Default |

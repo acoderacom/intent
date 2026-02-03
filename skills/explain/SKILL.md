@@ -31,24 +31,36 @@ Explore codebase to answer. After answering, offer to capture as knowledge.
 
 ## Step 3: Capture (after exploration only)
 
-`AskUserQuestion`: "Save as knowledge?" → Yes | Skip
+### Knowledge Format
 
-```bash
-npx intent-turso knowledge create --stdin << 'EOF'
+```markdown
 # {Title}
 
 **Namespace:** {project-namespace}
 **Category:** architecture|pattern|truth|principle
 **Source:** discovery
-**Confidence:** 0.75
-**Scope:** global
-**Tags:** {relevant-tags}
+**Confidence:** {see Confidence Defaults}
+**Scope:** new-only|global|backward-compatible|legacy-frozen
+**Tags:** {kebab-case, comma-separated}
 
 ## Content
 
-{formatted content}
+{Use format from Content Format by Category}
+```
+
+### Create Knowledge
+
+```bash
+npx intent-turso knowledge create --stdin << 'EOF'
+...knowledge content...
 EOF
 ```
+
+### Steps
+
+1. `AskUserQuestion`: "Save this knowledge?" → Yes | Edit | Cancel
+2. If Yes, create using command above
+
 ---
 
 ## Reference
