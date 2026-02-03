@@ -111,12 +111,12 @@ Append to project's `CLAUDE.md`:
 ### Knowledge Operations
 | Action | Command |
 |--------|---------|
-| Search | `npx intent-turso search "<query>" --limit 5 [--ticket-type <type>]` |
+| Search | `npx intent-turso search "<query>" [--limit N] [--namespace] [--category] [--ticket-type] [--tags] [--min-score]` |
 | Extract | `npx intent-turso extract <ticket-id>` |
 | Create | `npx intent-turso knowledge create --stdin` (heredoc) |
 | Get | `npx intent-turso knowledge get <id>` |
-| List | `npx intent-turso knowledge list [--category <cat>] [--scope <scope>] [--source <source>] [--active-only]` |
-| Update | `npx intent-turso knowledge update <id> [--title] [--content] [--category] [--tags] [--scope]` |
+| List | `npx intent-turso knowledge list [--namespace] [--category] [--scope] [--source] [--status active\|inactive\|all]` |
+| Update | `npx intent-turso knowledge update <id> [--title] [--content] [--category] [--tags] [--scope] [--confidence]` |
 | Deactivate | `npx intent-turso knowledge deactivate <id>` |
 | Recalculate | `npx intent-turso knowledge recalculate [--dry-run]` |
 ```
