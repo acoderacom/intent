@@ -17,7 +17,7 @@ Turn user intent into validated tickets. AI executes, human reviews, knowledge c
 
 ## Step 1: Context (search only)
 
-Read `CLAUDE.md`. Search knowledge → `npx intent-turso search "<intent>" --limit 3`
+Read `CLAUDE.md`. Search knowledge → `npx intent-turso search "<intent>" --limit 5`
 
 Use `--ticket-type` filter when intent matches a specific type.
 
@@ -25,7 +25,7 @@ Use `--ticket-type` filter when intent matches a specific type.
 
 **Do NOT explore codebase yet** - knowledge informs exploration strategy in Step 3.
 
-**Quick mode check:** If intent is simple (single file, obvious fix, low risk) → suggest `/ticket-quick` instead.
+**Quick mode check:** If intent is **Class A AND has no notable constraints** (not touching auth, payments, shared APIs, or schema) → suggest `/ticket-quick` instead. A single-file change to a critical module is NOT quick.
 
 ## Step 2: Clarify
 
@@ -52,9 +52,10 @@ Be ready to go back and clarify if something doesn't make sense.
 
 **Assumptions:** [AI's guesses - surfaces misalignment]
 
-**Tasks**
+**Tasks** (→ = depends on previous, ∥ = parallelizable)
 - [ ] Task 1 description
-- [ ] Task 2 description
+- [ ] → Task 2 description (depends on Task 1)
+- [ ] ∥ Task 3 description (parallel with Task 2)
 
 **Definition of Done**
 - [ ] Criterion 1
@@ -69,7 +70,7 @@ Be ready to go back and clarify if something doesn't make sense.
 **Tasks → Steps:**
 - task: [ticket task 1]
   - Implementation step
-- task: [ticket task 2]
+- task: [ticket task 2] (depends on: task 1)
   - Implementation step
 
 **Definition of Done → Verification:**
@@ -82,6 +83,10 @@ Be ready to go back and clarify if something doesn't make sense.
 **Trade-offs:** (omit if none)
 - considered: [alternative] | rejected: [reason]
 - limitation: [what might break at scale]
+
+**Rollback:** (required for Class B/C, omit for Class A)
+- How to undo changes if execution goes wrong
+- Reversibility: full|partial|none
 
 **Irreversible Actions:** (required for Class C, omit if none for A/B)
 - Description of action that can't be undone
@@ -117,14 +122,37 @@ EOF
 ## Step 4: Execute
 
 1. Update ticket status to `In Progress`
-2. For each task: `TaskUpdate` → `in_progress` → implement → `completed`
+2. For each task (respecting dependency order):
+   - `TaskUpdate` → `in_progress` → implement → `completed`
+   - **On task failure:** see Failure Protocol below
 3. Use `TaskList` for next task
+
+### Failure Protocol
+
+When a task fails during execution:
+
+1. **Can you fix it without changing the plan?** → Fix it, continue.
+2. **Is the plan itself wrong?** → Stop. `AskUserQuestion`: explain what failed and why. Options: Revise plan | Abort (see Abort Protocol).
+3. **Blocked on something external?** → Stop. Update ticket status to `Blocked`. `AskUserQuestion`: describe blocker.
+
+### Abort Protocol
+
+When the user says "stop" or execution reveals the ticket itself is wrong:
+
+1. Stop all in-progress work immediately
+2. `AskUserQuestion`: "Abort this ticket?"
+   - **Revert & close** → update ticket status to `Abandoned`, note reason, let user handle reverting files
+   - **Pause & keep** → leave changes in place, update ticket status to `Paused`, note where execution stopped and why
+   - **Pivot** → create new ticket informed by what was learned, link to original, update original status to `Superseded`
+3. **Always** extract knowledge from the failure (see Step 6, gotcha category)
 
 ## Step 5: Review (MANDATORY)
 
 1. Update ticket status to `In Review`
 2. Run code checks (test, lint, typecheck, build)
-3. Fix failures → re-run
+3. On failure, assess severity:
+   - Test/lint fixes only → fix and re-run
+   - Reveals plan flaw → trigger Failure Protocol
 4. `AskUserQuestion`: "Implementation complete. Please review." → Approve | Request changes
 5. After approval: `npx intent-turso ticket update <id> --status "Done" --complete-all`
 
@@ -136,7 +164,7 @@ EOF
 # {Title}
 
 **Namespace:** {project-namespace}
-**Category:** architecture|pattern|truth|principle
+**Category:** architecture|pattern|truth|principle|gotcha
 **Source:** ticket
 **Origin Ticket:** {ticket-id}
 **Origin Ticket Type:** {ticket-type}
@@ -160,8 +188,9 @@ EOF
 ### Steps
 
 1. Review `extractProposals` from Step 5's "Done" response
-2. `AskUserQuestion`: "Extract this knowledge?" → Accept all | Select items | Skip
-3. For accepted items, create using command above
+2. **If ticket was aborted/failed:** always propose at least one gotcha knowledge entry capturing what went wrong
+3. `AskUserQuestion`: "Extract this knowledge?" → Accept all | Select items | Skip
+4. For accepted items, create using command above
 
 ---
 
@@ -170,6 +199,8 @@ EOF
 ### Status Values
 
 `Backlog` → `In Progress` → `In Review` → `Done`
+
+Extended: `Blocked` (waiting on external), `Paused` (stopped intentionally), `Abandoned` (aborted, won't resume), `Superseded` (replaced by new ticket)
 
 ### Ticket Types
 
@@ -186,7 +217,7 @@ EOF
 
 | Class | Examples | Action |
 |-------|----------|--------|
-| A | Single file, tests, docs | Auto |
+| A | Single file, tests, docs (not in critical paths) | Auto |
 | B | Cross-module, APIs, deps | Propose |
 | C | Schema, auth, payments | Approval |
 
@@ -198,6 +229,7 @@ EOF
 | Architecture | 0.85 |
 | Pattern | 0.8 |
 | Principle | 0.75 |
+| Gotcha | 0.85 |
 
 ### Content Format by Category
 
@@ -244,4 +276,19 @@ Why:
 
 Applies:
 {scope}
+```
+
+**Gotcha:**
+```
+Attempted:
+{what was tried}
+
+Failed Because:
+{root cause — be specific}
+
+Instead:
+{what to do instead}
+
+Symptoms:
+{how you'd recognize this problem}
 ```

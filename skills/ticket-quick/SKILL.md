@@ -1,6 +1,6 @@
 ---
 name: ticket-quick
-description: Quick execution mode for confident, low-risk changes. Triggers on "quick fix", "just do it", "simple change", or explicit "/ticket-quick". Skips ceremony, preserves knowledge.
+description: Quick execution mode for confident, low-risk changes. Triggers on "quick fix", "just do it", "simple change", or explicit "quick ticket". Skips ceremony, preserves knowledge.
 ---
 
 # Quick Mode
