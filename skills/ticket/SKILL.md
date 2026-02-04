@@ -72,7 +72,7 @@ Be ready to go back and clarify if something doesn't make sense.
 - task: [ticket task 2]
   - Implementation step
 
-**DoD → Verification:**
+**Definition of Done → Verification:**
 - dod: [ticket DoD 1] | verify: How to verify
 - dod: [ticket DoD 2] | verify: How to verify
 
@@ -162,10 +162,6 @@ EOF
 1. Review `extractProposals` from Step 5's "Done" response
 2. `AskUserQuestion`: "Extract this knowledge?" → Accept all | Select items | Skip
 3. For accepted items, create using command above
-
-## Step 7: Capture Patterns to CLAUDE.md
-
-Ask: "Any patterns to add to CLAUDE.md?"
 
 ---
 
