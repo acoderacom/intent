@@ -65,6 +65,16 @@ EOF
 
 ## Reference
 
+### Confidence Defaults
+
+| Category | Default |
+|----------|---------|
+| Truth | 0.9 |
+| Architecture | 0.85 |
+| Pattern | 0.8 |
+| Principle | 0.75 |
+| Gotcha | 0.85 |
+
 ### Content Format by Category
 
 **Architecture:**

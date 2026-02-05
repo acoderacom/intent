@@ -29,7 +29,7 @@ Use Task tool with `subagent_type=Explore` to understand the topic.
 **Category:** architecture|pattern|truth|principle|gotcha
 **Source:** discovery
 **Confidence:** {see Confidence Defaults}
-**Scope:** global|new-only
+**Scope:** new-only|global|backward-compatible|legacy-frozen
 **Tags:** {kebab-case, comma-separated}
 
 ## Content
@@ -63,6 +63,7 @@ EOF
 | Architecture | 0.85 |
 | Pattern | 0.8 |
 | Principle | 0.75 |
+| Gotcha | 0.85 |
 
 ### Content Format by Category
 
