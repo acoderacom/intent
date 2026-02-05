@@ -1,31 +1,31 @@
 ---
 name: ticket-quick
-description: Quick execution mode for confident, low-risk changes. Triggers on "quick fix", "just do it", "simple change", or explicit "quick ticket". Skips ceremony, preserves knowledge.
+description: Quick execution for confident, low-risk changes. Triggers on "quick fix", "just do it", "simple change", or "/ticket-quick". Skips ceremony, preserves knowledge.
 ---
 
 # Quick Mode
 
 Skip ceremony, preserve knowledge. For confident, low-risk changes.
 
-**When to use:** Simple fixes, obvious changes, user is confident.
-**When NOT to use:** Complex features, unclear requirements, Class B/C changes → switch to `/ticket`.
+**When to use:** Simple fixes, obvious changes, Class A only.
+**When NOT to use:** Complex features, unclear requirements, Class B/C → `/ticket`.
 
 ## Step 1: Context (search only)
 
-Search knowledge → `npx intent-turso search "<intent>" --limit 3`
+```bash
+npx intent-turso search "<intent>" --limit 3
+```
 
 Use `--ticket-type` filter when intent matches a specific type.
 
 **Semantic Search:** ≥0.45 relevant, ≥0.55 strong. Don't discard low scores.
 
-**Do NOT explore codebase yet** - knowledge informs exploration in Step 2.
+**Don't explore codebase yet** — knowledge informs exploration in Step 2.
 
 ## Step 2: Execute
 
-### Steps
-
-1. **NOW explore codebase** (knowledge found → start from patterns/files, else broad)
-2. Implement directly - no ticket, no task tracking
+1. **Now explore codebase** (knowledge found → start from patterns/files, else broad)
+2. Implement directly — no ticket, no task tracking
 3. Run checks (test, lint, typecheck)
 4. Fix failures → re-run
 
@@ -47,21 +47,18 @@ Use `--ticket-type` filter when intent matches a specific type.
 
 ## Content
 
-{Use format from Content Format by Category}
-```
-
-### Create Knowledge
-
-```bash
-npx intent-turso knowledge create --stdin << 'EOF'
-...knowledge content...
-EOF
+{Use Content Formats from Reference}
 ```
 
 ### Steps
 
 1. `AskUserQuestion`: "Quick fix done. Extract knowledge?" → Yes | Skip
-2. If Yes, create using command above
+2. If Yes:
+   ```bash
+   npx intent-turso knowledge create --stdin << 'EOF'
+   ...knowledge content...
+   EOF
+   ```
 
 ---
 
@@ -73,80 +70,29 @@ EOF
 |--------|-------|----------|
 | Knowledge search | ✓ | ✓ |
 | Clarify questions | ✗ | ✓ |
-| Ticket creation | ✗ | ✓ |
-| Task tracking | ✗ | ✓ |
+| Ticket/task tracking | ✗ | ✓ |
 | Plan approval | ✗ | ✓ |
 | Code checks | ✓ | ✓ |
 | Human review | ✗ | ✓ (mandatory) |
-| Knowledge extract | ✓ (optional) | ✓ |
+| Knowledge extract | optional | ✓ |
 
 ### Confidence Defaults
 
 | Category | Default |
 |----------|---------|
 | Truth | 0.9 |
-| Architecture | 0.85 |
+| Architecture / Gotcha | 0.85 |
 | Pattern | 0.8 |
 | Principle | 0.75 |
 
-### Content Format by Category
+### Content Formats
 
-**Architecture:**
-```
-Component:
-{name}
+**Architecture:** `Component` / `Responsibility` / `Interfaces`
 
-Responsibility:
-{what it does}
+**Pattern:** `Why` / `When` / `Pattern`
 
-Interfaces:
-{how to interact}
-```
+**Truth:** `Fact` / `Verified`
 
-**Pattern:**
-```
-Why:
-{rationale}
+**Principle:** `Rule` / `Why` / `Applies`
 
-When:
-{conditions to apply}
-
-Pattern:
-{the approach}
-```
-
-**Truth:**
-```
-Fact:
-{verified fact}
-
-Verified:
-{how/where verified}
-```
-
-**Principle:**
-```
-Rule:
-{the rule}
-
-Why:
-{rationale}
-
-Applies:
-{scope}
-```
-
-**Gotcha:**
-```
-Attempted:
-{what was tried}
-
-Failed Because:
-{root cause — be specific}
-
-Instead:
-{what to do instead}
-
-Symptoms:
-{how you'd recognize this problem}
-```
+**Gotcha:** `Attempted` / `Failed Because` / `Instead` / `Symptoms`

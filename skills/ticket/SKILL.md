@@ -1,35 +1,50 @@
 ---
 name: ticket
-description: Create and execute development tickets. Triggers on "I want...", "Add/Build/Create...", ticket IDs (INT-*), or "create ticket". Covers features, components, and behavior changes.
+description: Create and execute development tickets. Triggers on "I want...", "Add/Build/Create...", ticket IDs (INT-*), "create ticket", "work on", "fetch ticket", "get ticket".
 ---
 
 # Intent-First Development
 
-Turn user intent into validated tickets. AI executes, human reviews, knowledge compounds.
+Intent → Ticket → Execute → Review → Learn
 
-**Mental Model:** Ticket = Contract (WHAT & WHY) | Plan = Playbook (HOW) | Knowledge = Memory (LEARNED)
+**Mental Model:** Ticket = Contract (WHAT) | Plan = Playbook (HOW) | Knowledge = Memory (LEARNED)
 
 ## Prerequisites (BLOCKING)
 
-1. Read `CLAUDE.md` for `## Intent Config`
-2. If missing → `/intent:setup` first
-3. **No config = no proceed**
+Read `CLAUDE.md` for `## Intent Config`. Missing → `/intent:setup` first. **No config = no proceed.**
+
+## Routing
+
+| Input | Detection | Action |
+|-------|-----------|--------|
+| New intent | "I want...", "Add...", "create ticket" | Step 1 |
+| AI ticket ID | `INT-YYYYMMDD-HHMMSS` | Fetch → resume from status |
+| Manual ticket | `INT-*-manual` suffix | Fetch → Enrich → Execute |
+
+### Manual Ticket Enrichment
+
+1. `npx intent-turso ticket get <id>`
+2. Run Steps 1-3 to fill gaps (Plan, Change Class, Constraints, etc.)
+3. `npx intent-turso ticket update <id> --plan-stdin << 'EOF' ... EOF`
+4. Proceed to Step 4
 
 ## Step 1: Context (search only)
 
-Read `CLAUDE.md`. Search knowledge → `npx intent-turso search "<intent>" --limit 5`
+```bash
+npx intent-turso search "<intent>" --limit 5
+```
 
 Use `--ticket-type` filter when intent matches a specific type.
 
 **Semantic Search:** ≥0.45 relevant, ≥0.55 strong. Don't discard low scores.
 
-**Do NOT explore codebase yet** - knowledge informs exploration strategy in Step 3.
+**Don't explore codebase yet** — knowledge informs exploration in Step 3.
 
-**Quick mode check:** If intent is **Class A AND has no notable constraints** (not touching auth, payments, shared APIs, or schema) → suggest `/ticket-quick` instead. A single-file change to a critical module is NOT quick.
+**Quick mode:** Class A + no critical constraints (auth, payments, APIs, schema) → suggest `/ticket-quick`. A single-file change to a critical module is NOT quick.
 
 ## Step 2: Clarify
 
-Use `AskUserQuestion` - one question at a time, 2-4 options each. For multiple approaches lead with recommended option, explain trade-offs in descriptions. Gather enough to fill the ticket — don't over-ask for Class A work.
+`AskUserQuestion` — one question at a time, 2-4 options each. Lead with recommended option, explain trade-offs in descriptions. Gather enough to fill the ticket — don't over-ask for Class A work.
 
 Be ready to go back and clarify if something doesn't make sense.
 
@@ -41,21 +56,16 @@ Be ready to go back and clarify if something doesn't make sense.
 # [INT-YYYYMMDD-HHMMSS] {intent summary}
 
 **Status:** Backlog
-
 **Type:** feature|bugfix|refactor|docs|chore|test (AI-inferred from intent)
-
 **Intent:** [what user wants]
-
 **Context:** [relevant files, patterns]
-
 **Constraints:** Use: [list] | Avoid: [list]
-
 **Assumptions:** [AI's guesses - surfaces misalignment]
 
-**Tasks** (→ = depends on previous, ∥ = parallelizable)
+**Tasks** (→ = sequential, ∥ = parallel)
 - [ ] Task 1 description
-- [ ] → Task 2 description (depends on Task 1)
-- [ ] ∥ Task 3 description (parallel with Task 2)
+- [ ] → Task 2 description
+- [ ] ∥ Task 3 description
 
 **Definition of Done**
 - [ ] Criterion 1
@@ -68,34 +78,35 @@ Be ready to go back and clarify if something doesn't make sense.
 **Files to Edit:** file1.ts, file2.ts
 
 **Tasks → Steps:**
-- task: [ticket task 1]
+- task: [task 1]
   - Implementation step
-- task: [ticket task 2]
+- task: [task 2]
   - Implementation step
 
 **Definition of Done → Verification:**
-- dod: [ticket DoD 1] | verify: How to verify
-- dod: [ticket DoD 2] | verify: How to verify
+- dod: [DoD 1] | verify: [how]
+- dod: [DoD 2] | verify: [how]
 
-**Decisions:** (implementation-level only, not ticket decisions)
-- choice: What | reason: Why
+**Decisions:**
+- choice: [what] | reason: [why]
 
 **Trade-offs:** (omit if none)
 - considered: [alternative] | rejected: [reason]
 - limitation: [what might break at scale]
 
-**Rollback:** (required for Class B/C, omit for Class A)
-- How to undo changes if execution goes wrong
-- Reversibility: full|partial|none
+**Rollback:** (Class B/C only)
+- [how to undo] | Reversibility: full|partial|none
 
-**Irreversible Actions:** (required for Class C, omit if none for A/B)
-- Description of action that can't be undone
+**Irreversible Actions:** (Class C only)
+- [description]
 
-**Edge Cases:** (required for Class C, omit if none for A/B)
-- Condition that might cause issues
+**Edge Cases:** (Class C only)
+- [condition]
 ```
 
 ### Create Ticket
+
+**Plan section is required for all tickets.**
 
 ```bash
 npx intent-turso ticket create --stdin << 'EOF'
@@ -104,14 +115,13 @@ npx intent-turso ticket create --stdin << 'EOF'
 ...ticket fields...
 
 ## Plan
-...plan fields (REQUIRED)...
+...plan fields...
 EOF
-```
 ```
 
 ### Steps
 
-1. **NOW explore codebase** (knowledge found → start from patterns/files, else broad)
+1. **Now explore codebase** (knowledge found → start from patterns/files, else broad)
 2. Output Ticket using format above
 3. Confirm by Change Class:
    - **Class A** → auto create ticket, proceed to execute
@@ -126,29 +136,27 @@ EOF
 ## Step 4: Execute
 
 1. Update ticket status to `In Progress`
-2. For each task (respecting dependency order):
+2. For each task (respect dependency order):
    - `TaskUpdate` → `in_progress` → implement → `completed`
-   - **On task failure:** see Failure Protocol below
+   - On failure → Failure Protocol
 3. Use `TaskList` for next task
 
 ### Failure Protocol
 
-When a task fails during execution:
-
-1. **Can you fix it without changing the plan?** → Fix it, continue.
-2. **Is the plan itself wrong?** → Stop. `AskUserQuestion`: explain what failed and why. Options: Revise plan | Abort (see Abort Protocol).
-3. **Blocked on something external?** → Stop. Update ticket status to `Blocked`. `AskUserQuestion`: describe blocker.
+1. **Fixable without changing the plan?** → Fix it, continue.
+2. **Plan itself wrong?** → Stop. `AskUserQuestion`: explain what failed. Options: Revise plan | Abort.
+3. **Blocked on something external?** → Status `Blocked`. `AskUserQuestion`: describe blocker.
 
 ### Abort Protocol
 
-When the user says "stop" or execution reveals the ticket itself is wrong:
+When user says "stop" or execution reveals the ticket is wrong:
 
-1. Stop all in-progress work immediately
+1. Stop in-progress work immediately
 2. `AskUserQuestion`: "Abort this ticket?"
-   - **Revert & close** → update ticket status to `Abandoned`, note reason, let user handle reverting files
-   - **Pause & keep** → leave changes in place, update ticket status to `Paused`, note where execution stopped and why
-   - **Pivot** → create new ticket informed by what was learned, link to original, update original status to `Superseded`
-3. **Always** extract knowledge from the failure (see Step 6, gotcha category)
+   - **Revert & close** → status `Abandoned`, note reason, user handles reverting files
+   - **Pause & keep** → status `Paused`, note where execution stopped and why
+   - **Pivot** → new ticket informed by what was learned, original marked `Superseded`
+3. **Always** extract gotcha knowledge from failures (Step 6)
 
 ## Step 5: Review (MANDATORY)
 
@@ -178,7 +186,7 @@ When the user says "stop" or execution reveals the ticket itself is wrong:
 
 ## Content
 
-{Use format from Content Format by Category}
+{Use Content Formats from Reference}
 ```
 
 ### Create Knowledge
@@ -192,7 +200,7 @@ EOF
 ### Steps
 
 1. Review `extractProposals` from Step 5's "Done" response
-2. **If ticket was aborted/failed:** always propose at least one gotcha knowledge entry capturing what went wrong
+2. **If ticket was aborted/failed:** always propose at least one gotcha entry
 3. `AskUserQuestion`: "Extract this knowledge?" → Accept all | Select items | Skip
 4. For accepted items, create using command above
 
@@ -200,22 +208,22 @@ EOF
 
 ## Reference
 
-### Status Values
+### Status Flow
 
 `Backlog` → `In Progress` → `In Review` → `Done`
 
-Extended: `Blocked` (waiting on external), `Paused` (stopped intentionally), `Abandoned` (aborted, won't resume), `Superseded` (replaced by new ticket)
+Extended: `Blocked` (waiting on external), `Paused` (stopped intentionally), `Abandoned` (aborted), `Superseded` (replaced by new ticket)
 
 ### Ticket Types
 
 | Type | Inferred From |
 |------|---------------|
-| `feature` | Add, create, build, implement, new |
-| `bugfix` | Fix, bug, error, broken, crash, fail |
-| `refactor` | Refactor, restructure, clean up, optimize |
-| `docs` | Document, readme, comment, explain |
-| `chore` | Update deps, migrate, config, CI/CD |
-| `test` | Test, spec, coverage, e2e |
+| feature | add, create, build, implement, new |
+| bugfix | fix, bug, error, broken, crash, fail |
+| refactor | refactor, restructure, clean up, optimize |
+| docs | document, readme, comment, explain |
+| chore | deps, migrate, config, CI/CD |
+| test | test, spec, coverage, e2e |
 
 ### Change Classes
 
@@ -230,69 +238,18 @@ Extended: `Blocked` (waiting on external), `Paused` (stopped intentionally), `Ab
 | Category | Default |
 |----------|---------|
 | Truth | 0.9 |
-| Architecture | 0.85 |
+| Architecture / Gotcha | 0.85 |
 | Pattern | 0.8 |
 | Principle | 0.75 |
-| Gotcha | 0.85 |
 
-### Content Format by Category
+### Content Formats
 
-**Architecture:**
-```
-Component:
-{name}
+**Architecture:** `Component` / `Responsibility` / `Interfaces`
 
-Responsibility:
-{what it does}
+**Pattern:** `Why` / `When` / `Pattern`
 
-Interfaces:
-{how to interact}
-```
+**Truth:** `Fact` / `Verified`
 
-**Pattern:**
-```
-Why:
-{rationale}
+**Principle:** `Rule` / `Why` / `Applies`
 
-When:
-{conditions to apply}
-
-Pattern:
-{the approach}
-```
-
-**Truth:**
-```
-Fact:
-{verified fact}
-
-Verified:
-{how/where verified}
-```
-
-**Principle:**
-```
-Rule:
-{the rule}
-
-Why:
-{rationale}
-
-Applies:
-{scope}
-```
-
-**Gotcha:**
-```
-Attempted:
-{what was tried}
-
-Failed Because:
-{root cause — be specific}
-
-Instead:
-{what to do instead}
-
-Symptoms:
-{how you'd recognize this problem}
-```
+**Gotcha:** `Attempted` / `Failed Because` / `Instead` / `Symptoms`

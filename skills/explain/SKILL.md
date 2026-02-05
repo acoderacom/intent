@@ -1,6 +1,6 @@
 ---
 name: explain
-description: Explain concepts, patterns, or decisions by searching the knowledge base FIRST. Triggers on "explain...", "why do we...", "how does X work", "what is our approach to...". IMPORTANT - This skill requires searching knowledge before any codebase exploration. If knowledge found, answer from knowledge only.
+description: Explain concepts, patterns, or decisions by searching knowledge FIRST. Triggers on "explain...", "why do we...", "how does X work", "what is our approach to...". Search knowledge before any codebase exploration. If knowledge found, answer from knowledge only.
 ---
 
 # Explain
@@ -9,11 +9,13 @@ Answer questions about concepts, patterns, architecture, or decisions.
 
 ## Step 1: Search Knowledge (BLOCKING)
 
-Search knowledge → `npx intent-turso search "<intent>" --limit 5`
+```bash
+npx intent-turso search "<intent>" --limit 5
+```
 
 Extract key terms from user's question for query.
 
-**Semantic Search:** ≥0.45 relevant, ≥0.55 strong match.
+**Semantic Search:** ≥0.45 relevant, ≥0.55 strong. Don't discard low scores.
 
 ## Step 2: Answer
 
@@ -45,21 +47,18 @@ Explore codebase to answer. After answering, offer to capture as knowledge.
 
 ## Content
 
-{Use format from Content Format by Category}
-```
-
-### Create Knowledge
-
-```bash
-npx intent-turso knowledge create --stdin << 'EOF'
-...knowledge content...
-EOF
+{Use Content Formats from Reference}
 ```
 
 ### Steps
 
 1. `AskUserQuestion`: "Save this knowledge?" → Yes | Edit | Cancel
-2. If Yes, create using command above
+2. If Yes:
+   ```bash
+   npx intent-turso knowledge create --stdin << 'EOF'
+   ...knowledge content...
+   EOF
+   ```
 
 ---
 
@@ -70,69 +69,18 @@ EOF
 | Category | Default |
 |----------|---------|
 | Truth | 0.9 |
-| Architecture | 0.85 |
+| Architecture / Gotcha | 0.85 |
 | Pattern | 0.8 |
 | Principle | 0.75 |
-| Gotcha | 0.85 |
 
-### Content Format by Category
+### Content Formats
 
-**Architecture:**
-```
-Component:
-{name}
+**Architecture:** `Component` / `Responsibility` / `Interfaces`
 
-Responsibility:
-{what it does}
+**Pattern:** `Why` / `When` / `Pattern`
 
-Interfaces:
-{how to interact}
-```
+**Truth:** `Fact` / `Verified`
 
-**Pattern:**
-```
-Why:
-{rationale}
+**Principle:** `Rule` / `Why` / `Applies`
 
-When:
-{conditions to apply}
-
-Pattern:
-{the approach}
-```
-
-**Truth:**
-```
-Fact:
-{verified fact}
-
-Verified:
-{how/where verified}
-```
-
-**Principle:**
-```
-Rule:
-{the rule}
-
-Why:
-{rationale}
-
-Applies:
-{scope}
-```
-
-**Gotcha:**
-```
-Attempted:
-{what was tried}
-
-Failed Because:
-{root cause — be specific}
-
-Instead:
-{what to do instead}
-
-Symptoms:
-{how you'd recognize this problem}
-```
+**Gotcha:** `Attempted` / `Failed Because` / `Instead` / `Symptoms`
