@@ -29,7 +29,7 @@ Use `--ticket-type` filter when intent matches a specific type.
 
 ## Step 2: Clarify
 
-Use `AskUserQuestion` - one question at a time, 2-4 options each. Focus on purpose, constraints, definition of done. For multiple approaches lead with recommended option, explain trade-offs in descriptions.
+Use `AskUserQuestion` - one question at a time, 2-4 options each. For multiple approaches lead with recommended option, explain trade-offs in descriptions. Gather enough to fill the ticket — don't over-ask for Class A work.
 
 Be ready to go back and clarify if something doesn't make sense.
 
@@ -70,7 +70,7 @@ Be ready to go back and clarify if something doesn't make sense.
 **Tasks → Steps:**
 - task: [ticket task 1]
   - Implementation step
-- task: [ticket task 2] (depends on: task 1)
+- task: [ticket task 2]
   - Implementation step
 
 **Definition of Done → Verification:**
@@ -101,8 +101,12 @@ Be ready to go back and clarify if something doesn't make sense.
 npx intent-turso ticket create --stdin << 'EOF'
 # [INT-YYYYMMDD-HHMMSS] {intent summary}
 **Status:** Backlog
-...full ticket content including ## Plan section...
+...ticket fields...
+
+## Plan
+...plan fields (REQUIRED)...
 EOF
+```
 ```
 
 ### Steps

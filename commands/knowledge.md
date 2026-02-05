@@ -26,7 +26,7 @@ Use Task tool with `subagent_type=Explore` to understand the topic.
 # {Title}
 
 **Namespace:** {project-namespace}
-**Category:** architecture|pattern|truth|principle
+**Category:** architecture|pattern|truth|principle|gotcha
 **Source:** discovery
 **Confidence:** {see Confidence Defaults}
 **Scope:** global|new-only
@@ -109,4 +109,19 @@ Why:
 
 Applies:
 {scope}
+```
+
+**Gotcha:**
+```
+Attempted:
+{what was tried}
+
+Failed Because:
+{root cause — be specific}
+
+Instead:
+{what to do instead}
+
+Symptoms:
+{how you'd recognize this problem}
 ```

@@ -37,7 +37,7 @@ Explore codebase to answer. After answering, offer to capture as knowledge.
 # {Title}
 
 **Namespace:** {project-namespace}
-**Category:** architecture|pattern|truth|principle
+**Category:** architecture|pattern|truth|principle|gotcha
 **Source:** discovery
 **Confidence:** {see Confidence Defaults}
 **Scope:** new-only|global|backward-compatible|legacy-frozen
@@ -110,4 +110,19 @@ Why:
 
 Applies:
 {scope}
+```
+
+**Gotcha:**
+```
+Attempted:
+{what was tried}
+
+Failed Because:
+{root cause — be specific}
+
+Instead:
+{what to do instead}
+
+Symptoms:
+{how you'd recognize this problem}
 ```
