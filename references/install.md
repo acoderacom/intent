@@ -1,4 +1,4 @@
-# Intent CLI Prerequisites
+# SID CLI Prerequisites
 
 Run once per machine. If `npx intent-turso --version` works, skip this.
 
@@ -12,4 +12,4 @@ Run once per machine. If `npx intent-turso --version` works, skip this.
 npx intent-turso --version
 ```
 
-If this works, return to `/intent:setup` for project configuration.
+If this works, return to `/setup` for project configuration.

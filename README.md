@@ -1,96 +1,62 @@
-# IFD For Claude Code
+# SID — Smart Intent Development
 
-Intent-First Development for Claude Code. Turn user intent into validated tickets, then execute.
+## What is SID?
 
-## Philosophy
+SID is a development framework where your intent drives the entire cycle — from idea to code to knowledge. Unlike typical AI coding tools that start from zero every session, SID **compounds**. Every cycle makes the next one smarter.
 
-**Capture before code.** Most AI coding failures happen because of misalignment - the AI builds the wrong thing. IFD fixes this by making alignment explicit before any code is written.
-
-The ticket format is designed to surface misalignment early:
-
-| Field | Purpose |
-|-------|---------|
-| **Intent** | What user wants, not how to build it |
-| **Context** | Ground the work in project reality |
-| **Constraints** | Boundaries: use this, avoid that |
-| **Assumptions** | AI's guesses - the alignment check |
-| **Tasks** | Concrete steps, reviewable before execution |
-| **Definition of Done** | Know when you're done, not when AI thinks you're done |
-| **Change Class** | Risk level determines review depth |
-
-The **Assumptions** field is the key innovation. Instead of AI silently making decisions, it surfaces guesses for human validation. Catch the "I thought you meant..." moment *before* code exists.
-
-**AI executes. Human reviews.** Not full autonomy. Collaboration with clear checkpoints.
-
-## What It Does
-
-Instead of jumping straight into code, Intent captures what you want to build as a ticket first:
-
-1. **Clarify** - Ask focused questions to understand requirements
-2. **Capture** - Create a validated ticket with tasks and done criteria
-3. **Plan** - Surface decisions, defaults, and irreversible changes
-4. **Execute** - Work through tasks systematically
-5. **Review** - Run checks, get approval, mark done
-
-## Install
-
-```bash
-claude plugin add /path/to/intent
-```
-
-## Setup
-
-```bash
-/intent:setup
-```
-
-Choose your task manager:
-- **Local** - Markdown files in `.intent/tickets/`
-- **Linear** - Requires Linear MCP server
-- **GitHub** - Uses `gh` CLI
-- **Jira** - Requires Jira MCP server
-- **Asana** - Requires Asana MCP server
-
-## Usage
-
-Express intent naturally:
+## The Loop
 
 ```
-I want to add dark mode
+  ┌──────────────────────────────────┐
+  │                                  │
+  ▼                                  │
+Intent ──► Work ──► Test ──► Compound
+                                │
+                        knowledge extracted
 ```
 
-Or invoke directly:
+**Intent** — Say what you want. SID figures out the right size:
+- `/spec` — big features, breaks down into tickets
+- `/ticket` — standard work with planning and review
+- `/task` — small stuff, just do it
 
-```
-/intent:new add user authentication
-```
+**Work** — AI builds it. Informed by knowledge from past cycles — patterns, architecture, gotchas, decisions. Not starting from zero.
 
-### Options When Creating Tickets
+**Test** — Check if it's right. Automated checks (tests, lint, typecheck) + human review. The quality gate that makes compounding possible.
 
-| Option | What Happens |
-|--------|--------------|
-| Yes, continue | Create ticket → Plan → Execute → Review |
-| Just create ticket | Create ticket → Stop (backlog it) |
-| No, let me clarify | Revise before creating |
+**Compound** — Knowledge is extracted from completed work and stored. What was built, how, why, what went wrong. This feeds back into the next Intent, making it smarter.
 
-## Ticket Format (Local)
+## Why SID?
 
-```
-.intent/tickets/INT-20260128-add-dark-mode.md
-```
+Most AI coding tools are **flat**. They execute, but they don't learn. Every session is a blank slate. Same mistakes, same questions, no memory.
 
-## Change Classes
+SID is **compound**. Each cycle adds knowledge. After 10 cycles, SID knows your patterns. After 50, it knows your architecture. After 100, it knows your project better than a new hire.
 
-| Class | Examples | Action |
-|-------|----------|--------|
-| A | Single file, tests, docs | Auto-execute |
-| B | Cross-module, APIs, deps | Propose first |
-| C | Schema, auth, payments | Explicit approval |
+**The difference isn't the AI. It's the loop.**
 
-## Derived From
+## How It Works
 
-[superpowers](https://github.com/obra/superpowers) by Jesse Vincent
+1. You express an intent: *"Build a user authentication system"*
+2. SID searches existing knowledge — has this project dealt with auth before?
+3. SID specs the work at the right level — this is big, so `/spec` breaks it into tickets
+4. AI executes each ticket, informed by past knowledge
+5. You review — approve, adjust, or reject
+6. Knowledge is extracted: architecture decisions, patterns used, gotchas discovered
+7. Next time auth comes up, SID already knows your approach
 
-## License
+## The Stack
 
-MIT - See [LICENSE](LICENSE)
+- **Skills** — Claude skills that drive each stage (spec, ticket, task, explain, learn)
+- **CLI Bridge** — `intent-turso` connects to the knowledge and ticket database
+- **Vector DB** — Searchable knowledge that compounds over time
+- **Human-in-the-loop** — You stay in control at the decision points
+
+## Core Principles
+
+**Intent over instruction.** Say what you want, not how to do it. SID figures out the how.
+
+**Compound over repeat.** Every cycle leaves behind knowledge. Nothing is wasted.
+
+**Right-sized work.** Not everything needs a plan. Not everything is a quick task. SID matches the level to the intent.
+
+**Human at the gates.** AI executes, human decides. The review step isn't a bottleneck — it's what makes the knowledge trustworthy.

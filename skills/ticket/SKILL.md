@@ -1,25 +1,32 @@
 ---
 name: ticket
-description: Create and execute development tickets. Triggers on "I want...", "Add/Build/Create...", ticket IDs (INT-*), "create ticket", "work on", "fetch ticket", "get ticket".
+description: Create and execute development tickets. Triggers on "I want...", "Add/Build/Create...", ticket IDs (INT-*), spec IDs (SPEC-*), "create ticket", "work on", "fetch ticket", "get ticket".
 ---
 
-# Intent-First Development
+# Smart Intent Development — Ticket
 
-Intent → Ticket → Execute → Review → Learn
-
-**Mental Model:** Ticket = Contract (WHAT) | Plan = Playbook (HOW) | Knowledge = Memory (LEARNED)
+Intent → Work → Test → Compound
 
 ## Prerequisites (BLOCKING)
 
-Read `CLAUDE.md` for `## Intent Config`. Missing → `/intent:setup` first. **No config = no proceed.**
+Read `CLAUDE.md` for `## Intent Config`. Missing → `/setup` first. **No config = no proceed.**
 
 ## Routing
 
 | Input | Detection | Action |
 |-------|-----------|--------|
 | New intent | "I want...", "Add...", "create ticket" | Step 1 |
+| Spec ID | `SPEC-*` | Fetch spec → break into tickets |
 | AI ticket ID | `INT-YYYYMMDD-HHMMSS` | Fetch → resume from status |
 | Manual ticket | `INT-*-manual` suffix | Fetch → Enrich → Execute |
+
+### From Spec
+
+1. `npx intent-turso spec get <id>`
+2. Read the ticket breakdown and sequence from the spec
+3. For each ticket in the breakdown, run Steps 1-3 (Context, Clarify, Capture) — the spec provides intent and constraints, but each ticket still needs its own codebase exploration and plan
+4. `AskUserQuestion`: "Create all tickets?" → All | One at a time | Revise
+5. Create tickets, proceed to execute first ticket
 
 ### Manual Ticket Enrichment
 
@@ -40,7 +47,7 @@ Use `--ticket-type` filter when intent matches a specific type.
 
 **Don't explore codebase yet** — knowledge informs exploration in Step 3.
 
-**Quick mode:** Class A + no critical constraints (auth, payments, APIs, schema) → suggest `/ticket-quick`. A single-file change to a critical module is NOT quick.
+**Quick mode:** Class A + no critical constraints (auth, payments, APIs, schema) → suggest `/task`. A single-file change to a critical module is NOT quick.
 
 ## Step 2: Clarify
 
@@ -168,7 +175,7 @@ When user says "stop" or execution reveals the ticket is wrong:
 4. `AskUserQuestion`: "Implementation complete. Please review." → Approve | Request changes
 5. After approval: `npx intent-turso ticket update <id> --status "Done" --complete-all`
 
-## Step 6: Knowledge Extraction
+## Step 6: Compound
 
 ### Knowledge Format
 

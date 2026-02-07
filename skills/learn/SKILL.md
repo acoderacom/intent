@@ -1,9 +1,9 @@
 ---
-name: knowledge
+name: learn
 description: Capture knowledge from codebase exploration. Triggers on "learn how...", "document how...", "how does X work".
 ---
 
-# Knowledge Discovery
+# Learn
 
 Explore codebase → capture understanding → save as searchable knowledge.
 ## Step 1: Explore
@@ -12,7 +12,7 @@ Use Task tool with `subagent_type=Explore` to understand the topic.
 
 **Parallel exploration:** For complex topics, run multiple Explore agents in parallel (one message, multiple Task calls) — e.g., explore architecture + explore patterns + explore usage.
 
-## Step 2: Capture
+## Step 2: Compound
 
 ### Knowledge Format
 

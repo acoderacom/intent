@@ -2,4 +2,5 @@
 .claude
 intent-turso
 .intent/.env
+.intent/*.db.intent/.env
 .intent/*.db

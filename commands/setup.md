@@ -1,8 +1,8 @@
 ---
-description: Configure Intent for this project
+description: Configure SID for this project
 ---
 
-# Intent Setup
+# SID Setup
 
 ## Step 1: Check Prerequisites
 
@@ -14,28 +14,28 @@ If fails → guide user to [install.md](../references/install.md), then return h
 
 ## Step 2: Choose Database Mode
 
-`AskUserQuestion`: "Where to store Intent data?"
-- **Local (Recommended)** → Turso database in `.intent/local.db`, no account needed
+`AskUserQuestion`: "Where to store SID data?"
+- **Local (Recommended)** → Turso database in `.smart-intent/local.db`, no account needed
 - **Cloud** → Turso Cloud, requires account and credentials
 
 ## Step 3: Create Config
 
 ```bash
-mkdir -p .intent && echo -e ".intent/.env\n.intent/*.db" >> .gitignore
+mkdir -p .smart-intent && echo -e ".smart-intent/.env\n.smart-intent/*.db" >> .gitignore
 ```
 
 ### If Local:
 
-Create `.intent/.env` automatically:
+Create `.smart-intent/.env` automatically:
 ```bash
-npx intent-turso init --url "file:.intent/local.db"
+npx intent-turso init --url "file:.smart-intent/local.db"
 ```
 
 ### If Cloud:
 
 Guide user to get Turso credentials via https://turso.tech (free tier) or Turso CLI.
 
-Then tell user to create `.intent/.env` with:
+Then tell user to create `.smart-intent/.env` with:
 ```env
 TURSO_URL="libsql://your-db.turso.io"
 TURSO_AUTH_TOKEN="your-token"
@@ -66,7 +66,7 @@ Check if `.claude/settings.local.json` exists, then add permission:
 }
 ```
 
-**Note:** The Intent plugin's `hooks/hooks.json` automatically handles auto-approval for `npx intent-turso` commands via `${CLAUDE_PLUGIN_ROOT}`.
+**Note:** The SID plugin's `hooks/hooks.json` automatically handles auto-approval for `npx intent-turso` commands via `${CLAUDE_PLUGIN_ROOT}`.
 
 ## Step 6: Write CLAUDE.md
 
@@ -76,14 +76,14 @@ Append to project's `CLAUDE.md`:
 ```markdown
 ## Intent Config
 - Task Manager: Turso
-- Database: Local SQLite (`.intent/local.db`)
+- Database: Local SQLite (`.smart-intent/local.db`)
 ```
 
 ### If Cloud:
 ```markdown
 ## Intent Config
 - Task Manager: Turso
-- Database: Turso Cloud (configured via `.intent/.env`)
+- Database: Turso Cloud (configured via `.smart-intent/.env`)
 ```
 
 ### Both modes - add commands:
@@ -108,6 +108,15 @@ Append to project's `CLAUDE.md`:
 | List | `npx intent-turso ticket list [--status <status>]` |
 | Delete | `npx intent-turso ticket delete <id>` |
 
+### Spec Operations
+| Action | Command |
+|--------|---------|
+| Create | `npx intent-turso spec create --stdin` (heredoc) |
+| Get | `npx intent-turso spec get <id>` |
+| List | `npx intent-turso spec list [--limit N]` |
+| Update | `npx intent-turso spec update <id> [--title] [--content-stdin]` |
+| Delete | `npx intent-turso spec delete <id>` |
+
 ### Knowledge Operations
 | Action | Command |
 |--------|---------|
@@ -123,4 +132,4 @@ Append to project's `CLAUDE.md`:
 
 ## Step 7: Confirm
 
-Say: "Intent configured. Use `/intent:new` to create tickets."
+Say: "SID configured. Use `/ticket` to create tickets, `/task` for quick fixes, `/spec` for big features."
